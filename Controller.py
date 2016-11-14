@@ -24,21 +24,20 @@ if output non found...
 ok- echo 'no file found'
 """
 
-import datetime, getopt, logging, os, pprint, re, sys
+import datetime, getopt, logging, os, pprint, re, sys, time
 
 ## add project parent-directory to sys.path
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
-from annex_eod_project import DatePrepper, FileHandler
+from annex_eod_project import DatePrepper, FileHandler, NameConverter
 # import Emailer
-# import NameConverter
 # import Parser
 # import Writer
 
 logging.basicConfig(
-    filename=settings.LOG_PATH,
+    # filename=settings.LOG_PATH,
     level=logging.DEBUG,
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
@@ -48,6 +47,7 @@ log.info( 'script started' )
 
 datePrepperInstance = DatePrepper.DatePrepper()
 fileHandlerInstance = FileHandler.FileHandler()
+nameConverterInstance = NameConverter.NameConverter()
 
 
 ## perceive the arguments sent in
@@ -97,7 +97,10 @@ Cron job starting at `{}`.
             self.endProgram()
 
         # check for files
+        log.debug( 'about to call scanDirectory()' )
         filesToExamineList = fileHandlerInstance.scanDirectory(self.sourceDir)
+        log.debug( 'scanDirectory call done' )
+        # time.sleep( 1 )
         goodFileList = fileHandlerInstance.makeGoodList(self.prefixList, filesToExamineList)
         if ( goodFileList == [] ):
             # self.log = writerInstance.appendText(self.log, "No files found.")
@@ -121,10 +124,10 @@ Cron job starting at `{}`.
             self.endProgram()
 
         # make archiveOrig fileName dictionary
-        datePrepperInstance = DatePrepper.DatePrepper()
+        # datePrepperInstance = DatePrepper.DatePrepper()
         timeStamp = datePrepperInstance.prepareTimeStamp()
         self.timeStamp = timeStamp
-        nameConverterInstance = NameConverter.NameConverter()
+        # nameConverterInstance = NameConverter.NameConverter()
         sourceToOriginalDictionary = nameConverterInstance.makeTrueOrigToArchiveOrigDictionary(goodFileList, self.timeStamp)
 
         # copy files to archiveOrig
