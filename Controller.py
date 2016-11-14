@@ -40,7 +40,7 @@ from annex_eod_project import FileHandler
 # import Writer
 
 logging.basicConfig(
-    # filename=settings.LOG_PATH,
+    filename=settings.LOG_PATH,
     level=logging.DEBUG,
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
@@ -215,6 +215,7 @@ Cron job ending at `{}`
         if(self.filesFound == True):
             emailerInstance = Emailer.Emailer()
             message = self.email_message
+            log.debug( 'sending email, message, ```{}```'.format(message) )
             emailerInstance.sendEmail(message)
         sys.exit()
 
