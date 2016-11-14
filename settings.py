@@ -12,3 +12,11 @@ ARCHIVE_PARSED_DIR = unicode( os.environ['ANXEOD__ARCHIVE_PARSED_DIR_PATH'] )   
 DESTINATION_DIR = unicode( os.environ['ANXEOD__DESTINATION_DIR_PATH'] )             # should end in '/'
 
 PREFIX_LIST = json.loads( os.environ['ANXEOD__PREFIX_LIST_JSON'] )
+
+MAIL_SMTPSERVER = unicode( os.environ['ANXEOD__MAIL_SMTPSERVER'] )
+MAIL_RECIPIENTS = json.loads( os.environ['ANXEOD__MAIL_RECIPIENTS_JSON'] )
+MAIL_SENDER = unicode( os.environ['ANXEOD__MAIL_SENDER'] )
+MAIL_HEADERTO = unicode( os.environ['ANXEOD__MAIL_MAIL_HEADERTO'] )
+MAIL_HEADERCC = unicode( os.environ['ANXEOD__MAIL_MAIL_HEADERCC'] )
+MAIL_HEADERFROM = unicode( os.environ['ANXEOD__MAIL_MAIL_HEADERFROM'] )
+MAIL_SUBJECT = unicode( os.environ['ANXEOD__MAIL_MAIL_SUBJECT'] )
