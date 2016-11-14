@@ -31,10 +31,8 @@ parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
-from annex_eod_project import DatePrepper, FileHandler, NameConverter, Parser
-# import Emailer
-# import Parser
-# import Writer
+from annex_eod_project import DatePrepper, Emailer, FileHandler, NameConverter, Parser
+
 
 logging.basicConfig(
     # filename=settings.LOG_PATH,
@@ -46,6 +44,7 @@ log.info( 'script started' )
 
 
 datePrepperInstance = DatePrepper.DatePrepper()
+emailerInstance = Emailer.Emailer()
 fileHandlerInstance = FileHandler.FileHandler()
 nameConverterInstance = NameConverter.NameConverter()
 parserInstance = Parser.Parser()
@@ -216,7 +215,7 @@ Cron job ending at `{}`
         log.debug( 'ending program, ```{}```'.format(message) )
         ## email notice if files found
         if(self.filesFound == True):
-            emailerInstance = Emailer.Emailer()
+            # emailerInstance = Emailer.Emailer()
             message = self.email_message
             log.debug( 'sending email, message, ```{}```'.format(message) )
             emailerInstance.sendEmail(message)

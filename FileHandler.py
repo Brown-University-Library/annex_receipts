@@ -8,7 +8,6 @@ Scan for existence of files.
 """
 
 import logging, os, pprint, shutil, string, time
-# from annex_eod_project import NameConverter
 
 
 log = logging.getLogger(__name__)
