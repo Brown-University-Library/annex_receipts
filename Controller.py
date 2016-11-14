@@ -31,6 +31,7 @@ parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
+from annex_eod_project import FileHandler
 # import DatePrepper
 # import Emailer
 # import FileHandler
@@ -45,6 +46,9 @@ logging.basicConfig(
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
 log.info( 'script started' )
+
+
+fileHandlerInstance = FileHandler.FileHandler()
 
 
 ## perceive the arguments sent in
