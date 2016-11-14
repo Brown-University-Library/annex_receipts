@@ -123,7 +123,7 @@ Cron job starting at `{}`.
             log.error( 'Error validating archive-original-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
-        # make archiveOrig fileName dictionary
+        ## make archiveOrig fileName dictionary
         # datePrepperInstance = DatePrepper.DatePrepper()
         timeStamp = datePrepperInstance.prepareTimeStamp()
         self.timeStamp = timeStamp

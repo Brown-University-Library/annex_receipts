@@ -43,6 +43,7 @@ class FileHandler( object ):
         ## 1) eliminate .DS_Store & 2) eliminate directories
         newFileList = []
         for fileName in fileList:
+            # log.debug( 'in for loop' )
             if(fileName == ".DS_Store"):
                 pass
             else:
@@ -51,7 +52,7 @@ class FileHandler( object ):
                     pass
                 else:
                     newFileList.append(fileName)
-        time.sleep( 1 )
+        # time.sleep( 1 )
         log.debug( 'scan-dir newFileList for directory, `{dirZ}` is, ```{lstZ}```'.format(dirZ=directory, lstZ=pprint.pformat(newFileList)) )
         return newFileList
 
@@ -111,6 +112,7 @@ class FileHandler( object ):
         if (directory.endswith("/") == False):
             directory = directory + "/"
 
+        log.debug( 'about to call scanDirectory()' )
         fileList = self.scanDirectory(directory)
 
         # import os
@@ -118,6 +120,7 @@ class FileHandler( object ):
             fullFileName = directory + fileName
             os.remove(fullFileName)
 
+        log.debug( 'about to call scanDirectory()' )
         newFileList = self.scanDirectory(directory)
         if ( newFileList == [] ):
             returnValue = "success"
@@ -199,6 +202,7 @@ class FileHandler( object ):
 
         # verification
         returnValue = "init"
+        log.debug( 'about to call scanDirectory()' )
         filesStillInDirectory = self.scanDirectory(directory)
 
         for newFileName in filesStillInDirectory:
@@ -219,6 +223,7 @@ class FileHandler( object ):
 
     def makeCountFileList(self, directory, prefixList):
 
+        log.debug( 'about to call scanDirectory()' )
         initialList = self.scanDirectory(directory)
         newList = []
 
