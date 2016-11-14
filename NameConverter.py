@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
-log.debug( 'sys.path, {}'.format(pprint.pformat(sys.path)) )
+# log.debug( 'sys.path, {}'.format(pprint.pformat(sys.path)) )
 
 from annex_eod_project import FileHandler
 
@@ -57,25 +57,6 @@ class NameConverter( object ):
 
 
 
-#   def makeArchiveOrigToArchiveParsedDictionary(self, inputDictionary, timeStamp, archiveOrigDirectory):
-#
-#       builtDict = {}
-#
-#       for fileName in inputDictionary.values(): # inputDictionary is like {"QHACS_0615.txt":"ORIG_QHACS_2005-06-15T13-41-39.dat"}
-#           # check to see if file is empty. if so, don't include it in output dictionary.
-#           fullFilePath = archiveOrigDirectory + fileName
-#           fileReference = open(fullFilePath, "r")
-#           firstLine = fileReference.readline()
-#           if( len(firstLine) > 0 ):
-#               key = fileName
-#               rootSlice = fileName[5:10]
-#               value = "PARSED_" + rootSlice + "_" + timeStamp + ".dat"
-#               builtDict[key] = value
-#
-#       return builtDict
-
-
-
     def convertInputToOriginal(self, inputFileName):
 
         if(inputFileName[:4] == "ORIG"):
@@ -104,44 +85,6 @@ class NameConverter( object ):
             builtDict[key] = value
 
         return builtDict
-
-
-
-#   def prepareFinalDestinationDictionary(self, archiveOriginalToArchiveParsedDictionary):
-#
-#       builtDict = {}
-#       for parsedFileName in archiveOriginalToArchiveParsedDictionary.values():
-#           key = parsedFileName
-#
-#           root = parsedFileName[7:12]
-#           month = parsedFileName[18:20]
-#           day = parsedFileName[21:23]
-#
-#           value = root + "_" + month + day + ".txt"
-#           builtDict[key] = value
-#
-#       return builtDict
-
-
-
-#   def prepareFinalDestinationDictionary(self, archiveOriginalToArchiveParsedDictionary):
-#
-#       builtDict = {}
-#       for parsedFileName in archiveOriginalToArchiveParsedDictionary.values():
-#           key = parsedFileName
-#
-#           root = parsedFileName[7:12]
-#           import string
-#           root = string.lower(root)
-#
-#           month = parsedFileName[18:20]
-#           day = parsedFileName[21:23]
-#
-#           value = root + month + day + ".txt"
-#           builtDict[key] = value
-#
-#       return builtDict
-
 
 
 
