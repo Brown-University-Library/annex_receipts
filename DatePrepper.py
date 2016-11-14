@@ -2,12 +2,12 @@
 
 from __future__ import unicode_literals
 
-import logging, time
-
 """
 Part of LAS-to-Josiah code.
 Obtain date in right format when needed.
 """
+
+import logging, time
 
 
 log = logging.getLogger(__name__)
