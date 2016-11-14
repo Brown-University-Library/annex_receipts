@@ -111,7 +111,7 @@ Cron job starting at `{}`.
         # self.log = writerInstance.appendText(self.log, "File(s) found.")
         message = 'File(s) found.'
         # self.email_message = '\n{}\n'.format( message )
-        self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
+        self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
         log.info( message )
 
         #######
@@ -177,7 +177,9 @@ Cron job starting at `{}`.
             self.endProgram()
         else:
             # self.log = writerInstance.appendText(self.log, "Files processed: " + parserInstance.statusMessage + ".")
-            log.info( 'Files parsed: ```{}```.'.format(parserInstance.statusMessage) )
+            message = 'Files processed: {}.'.format(parserInstance.statusMessage)
+            self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+            log.info( message )
 
         archiveOriginalToArchiveParsedDictionary = parserInstance.nonEmptiesDictionary
 
@@ -198,7 +200,7 @@ Cron job starting at `{}`.
             # self.log = writerInstance.appendText(self.log, "Files ready for Josiah: " + fileHandlerInstance.statusMessage + ".")
             message = 'Files ready for Josiah: {}.'.format(fileHandlerInstance.statusMessage)
             # self.email_message = '\n{}\n'.format( message )
-            self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
+            self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
             log.info( message )
             self.endProgram()
 
