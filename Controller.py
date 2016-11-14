@@ -31,7 +31,6 @@ parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
-# from annex_eod_project import ArgumentReader
 # import DatePrepper
 # import Emailer
 # import FileHandler
@@ -64,19 +63,13 @@ class Controller( object ):
         self.timeStamp = "init"
         self.filesFound = "init" # will be True or False
 
-    def manageProcessing(self, args):
+    def manageProcessing( self, args ):
 
-        # print '- in Controller.py, manageProcessing(); starting'
-        log.info( 'starting' )
-
-        # prepare the initial text indicating the script is running
-        # writerInstance = Writer.Writer()
-        # self.log = writerInstance.obtainStartText()
-
+        ## prepare the initial text indicating the script is running
         log.info( """
             -------
 
-            Cron job starting at `{}`
+            Cron job starting at `{}`.
             """.format(unicode(datetime.datetime.now()))
             )
 
@@ -84,9 +77,8 @@ class Controller( object ):
         # check for new files
         #######
 
-        # 'checking' notice
-        self.log = writerInstance.appendText(self.log, " ")
-        self.log = writerInstance.appendText(self.log, "Checking for new file(s).")
+        ## 'checking' notice
+        log.info( 'Checking for new file(s).' )
 
         # validate source-directory existence
         fileHandlerInstance = FileHandler.FileHandler()
