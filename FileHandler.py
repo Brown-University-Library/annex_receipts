@@ -31,8 +31,6 @@ class FileHandler( object ):
         log.debug( 'existence-check for dir `{dir}` has returnValue, `{val}`'.format(dir=directory, val=returnValue) )
         return returnValue
 
-
-
     def scanDirectory( self, directory ):
         """ Lists files.
             Called by controller. """
