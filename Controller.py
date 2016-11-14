@@ -200,13 +200,18 @@ Cron job starting at `{}`.
 
 
     def endProgram(self):
-        writerInstance = Writer.Writer()
-        endText = writerInstance.obtainEndText()
+        # writerInstance = Writer.Writer()
+        message = """
+Cron job ending at `{}`
+
+-------
+""".format( unicode(datetime.datetime.now()) )
+        # endText = writerInstance.obtainEndText()
         # finalLog = writerInstance.appendText(self.log, endText)
         # print finalLog
-        self.email_message = '\n{}\n'.format( endText )
-        log.debug( 'ending program, ```{}```'.endText )
-        # email notice if files found
+        self.email_message = '\n{}\n'.format( message )
+        log.debug( 'ending program, ```{}```'.format(message) )
+        ## email notice if files found
         if(self.filesFound == True):
             emailerInstance = Emailer.Emailer()
             message = self.email_message
@@ -215,10 +220,6 @@ Cron job starting at `{}`.
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     someClassInstance = Controller()
     someClassInstance.manageProcessing(args)
-
-
-
-# bottom
