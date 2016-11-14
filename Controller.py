@@ -31,7 +31,7 @@ parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
-from annex_eod_project import DatePrepper, FileHandler, NameConverter
+from annex_eod_project import DatePrepper, FileHandler, NameConverter, Parser
 # import Emailer
 # import Parser
 # import Writer
@@ -48,6 +48,7 @@ log.info( 'script started' )
 datePrepperInstance = DatePrepper.DatePrepper()
 fileHandlerInstance = FileHandler.FileHandler()
 nameConverterInstance = NameConverter.NameConverter()
+parserInstance = Parser.Parser()
 
 
 ## perceive the arguments sent in
@@ -167,7 +168,7 @@ Cron job starting at `{}`.
         archiveOriginalToArchiveParsedDictionary = nameConverterInstance.makeArchiveOrigToArchiveParsedDictionary(sourceToOriginalDictionary, self.timeStamp)
 
         #parse -- blank files not copied to archiveParse, fileName removed from 'archiveOriginalToArchiveParsedDictionary' below
-        parserInstance = Parser.Parser()
+        # parserInstance = Parser.Parser()
         parseCheck = parserInstance.parseFileDictionary(self.archiveOrigDir, self.archiveParsedDir, archiveOriginalToArchiveParsedDictionary)
         if (parseCheck != "success"):
             # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
