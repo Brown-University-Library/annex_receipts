@@ -24,7 +24,7 @@ if output non found...
 ok- echo 'no file found'
 """
 
-import getopt, logging, os, pprint, re, sys
+import datetime, getopt, logging, os, pprint, re, sys
 
 ## add project parent-directory to sys.path
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
@@ -45,7 +45,7 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
-# log.info( 'script started' )
+log.info( 'script started' )
 
 
 ## perceive the arguments sent in
@@ -55,17 +55,14 @@ opts, args = getopt.getopt(sys.argv[1:], 'd')   # I don't remember what the 'd' 
 class Controller( object ):
 
     def __init__( self ):
-        # log = "init"
+        log.debug( 'controller initialized' )
         self.sourceDir = settings.SOURCE_DIR
         self.archiveOrigDir = settings.ARCHIVE_ORIGINAL_DIR
         self.archiveParsedDir = settings.ARCHIVE_PARSED_DIR
         self.destinationDir = settings.DESTINATION_DIR
-        # prefixList = ["QSACS","QSREF","QHACS", "QHREF"]
         self.prefixList = settings.PREFIX_LIST
         self.timeStamp = "init"
-        self.filesFound = "init" # true or false
-
-
+        self.filesFound = "init" # will be True or False
 
     def manageProcessing(self, args):
 
@@ -73,27 +70,15 @@ class Controller( object ):
         log.info( 'starting' )
 
         # prepare the initial text indicating the script is running
-        writerInstance = Writer.Writer()
-        self.log = writerInstance.obtainStartText()
+        # writerInstance = Writer.Writer()
+        # self.log = writerInstance.obtainStartText()
 
-        # capture and validate the arguments passed by the cron job to Controller (sourceDirectory, archiveDirectory, destinationDirectory)
-        argReaderInstance = ArgumentReader.ArgumentReader()
-        argCheck = argReaderInstance.ensureNumberOfArgs(args)
+        log.info( """
+            -------
 
-        if(argCheck != "valid"):
-
-            self.log = writerInstance.appendText(self.log, " ")
-            self.log = writerInstance.appendText(self.log, argReaderInstance.errorMessage)
-            self.endProgram()
-
-        #######
-        # capture args
-        #######
-
-        self.sourceDir = args[0]
-        self.archiveOrigDir = args[1]
-        self.archiveParsedDir = args[2]
-        self.destinationDir = args[3]
+            Cron job starting at `{}`
+            """.format(unicode(datetime.datetime.now()))
+            )
 
         #######
         # check for new files
