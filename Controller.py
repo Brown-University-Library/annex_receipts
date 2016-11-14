@@ -31,10 +31,8 @@ parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
-from annex_eod_project import FileHandler
-# import DatePrepper
+from annex_eod_project import DatePrepper, FileHandler
 # import Emailer
-# import FileHandler
 # import NameConverter
 # import Parser
 # import Writer
@@ -48,6 +46,7 @@ log = logging.getLogger(__name__)
 log.info( 'script started' )
 
 
+datePrepperInstance = DatePrepper.DatePrepper()
 fileHandlerInstance = FileHandler.FileHandler()
 
 

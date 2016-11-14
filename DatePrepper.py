@@ -13,36 +13,26 @@ Obtain date in right format when needed.
 log = logging.getLogger(__name__)
 
 
-class DatePrepper:
+class DatePrepper(object):
 
+    def __init__(self):
+        self.timeToFormat = ""
 
-
-	timeToFormat = ""
-
-
-
-	def obtainDate(self):
-		# import time
-		if( len(self.timeToFormat) == 0):
-			theTime = time.localtime()
-		else:
-			theTime = self.timeToFormat
-		formattedTime = time.strftime("%a %b %d %H:%M:%S %Z %Y", theTime)
+    def obtainDate(self):
+        # import time
+        if( len(self.timeToFormat) == 0):
+            theTime = time.localtime()
+        else:
+            theTime = self.timeToFormat
+        formattedTime = time.strftime("%a %b %d %H:%M:%S %Z %Y", theTime)
         log.debug( 'type, formattedTime, `{}`'.format(type(formattedTime)) )
-		return formattedTime
+        return formattedTime
 
-
-
-	def prepareTimeStamp(self):
-		# import time
-		if( len(self.timeToFormat) == 0):
-			theTime = time.localtime()
-		else:
-			theTime = self.timeToFormat
-		formattedTime = time.strftime("%Y-%m-%dT%H-%M-%S", theTime)
-		return formattedTime
-
-
-
-
-# bottom
+    def prepareTimeStamp(self):
+        # import time
+        if( len(self.timeToFormat) == 0):
+            theTime = time.localtime()
+        else:
+            theTime = self.timeToFormat
+        formattedTime = time.strftime("%Y-%m-%dT%H-%M-%S", theTime)
+        return formattedTime
