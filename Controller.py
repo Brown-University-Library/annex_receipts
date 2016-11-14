@@ -66,41 +66,49 @@ class Controller( object ):
         self.prefixList = settings.PREFIX_LIST
         self.timeStamp = "init"
         self.filesFound = "init" # will be True or False
+        self.email_message = ''
 
     def manageProcessing( self, args ):
 
         ## prepare the initial text indicating the script is running
-        log.info( """
-            -------
+        message = """
+-------
 
-            Cron job starting at `{}`.
-            """.format(unicode(datetime.datetime.now()))
-            )
+Cron job starting at `{}`.
+""".format( unicode(datetime.datetime.now()) )
+
+        self.email_message = message
+        log.info( message )
 
         #######
         # check for new files
         #######
 
         ## 'checking' notice
-        log.info( 'Checking for new file(s).' )
+        message = 'Checking for new file(s).'
+        self.email_message = '\n{}\n'.format( message )
+        log.info( message )
 
-        # validate source-directory existence
+        ## validate source-directory existence
         fileHandlerInstance = FileHandler.FileHandler()
         sourceDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.sourceDir)
         if(sourceDirectoryExistenceCheck != "exists"):
-            self.log = writerInstance.appendText(self.log, " ")
-            self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            log.error( 'Error validating source-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
         # check for files
         filesToExamineList = fileHandlerInstance.scanDirectory(self.sourceDir)
         goodFileList = fileHandlerInstance.makeGoodList(self.prefixList, filesToExamineList)
-        self.log = writerInstance.appendText(self.log, " ")
         if ( goodFileList == [] ):
-            self.log = writerInstance.appendText(self.log, "No files found.")
+            # self.log = writerInstance.appendText(self.log, "No files found.")
+            log.info( 'No files found.' )
             self.endProgram()
         self.filesFound = True
-        self.log = writerInstance.appendText(self.log, "File(s) found.")
+        # self.log = writerInstance.appendText(self.log, "File(s) found.")
+        message = 'File(s) found.'
+        self.email_message = '\n{}\n'.format( message )
+        log.info( message )
 
         #######
         # copy files to archive location
@@ -109,8 +117,8 @@ class Controller( object ):
         # validate archiveOrig directory existence
         archiveDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.archiveOrigDir)
         if(archiveDirectoryExistenceCheck != "exists"):
-            self.log = writerInstance.appendText(self.log, " ")
-            self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            log.error( 'Error validating archive-original-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
         # make archiveOrig fileName dictionary
@@ -123,8 +131,8 @@ class Controller( object ):
         # copy files to archiveOrig
         fileCopyCheck = fileHandlerInstance.copyFileDictionary(sourceToOriginalDictionary, self.sourceDir, self.archiveOrigDir)
         if (fileCopyCheck != "success"):
-            self.log = writerInstance.appendText(self.log, " ")
-            self.log = writerInstance.appendText(self.log, "ERROR: Couldn't copy found files to archive_orig directory. Halting program.")
+            # self.log = writerInstance.appendText(self.log, "ERROR: Couldn't copy found files to archive_orig directory. Halting program.")
+            log.error( 'ERROR: Couldn\'t copy found files to archive_orig directory. Halting program.' )
             self.endProgram()
 
         #######
@@ -134,8 +142,8 @@ class Controller( object ):
         # delete files just saved from 'outbound'
         resultOfDeletion = fileHandlerInstance.deleteListFiles(goodFileList, self.sourceDir)
         if (resultOfDeletion != "success"):
-            self.log = writerInstance.appendText(self.log, " ")
-            self.log = writerInstance.appendText(self.log, "ERROR: Couldn't delete original files: " + fileHandlerInstance.errorMessage + " Halting program.")
+            # self.log = writerInstance.appendText(self.log, "ERROR: Couldn't delete original files: " + fileHandlerInstance.errorMessage + " Halting program.")
+            log.error( 'ERROR: Couldn\'t delete original files: ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
         # delete count files
@@ -149,8 +157,8 @@ class Controller( object ):
         # validate archiveParsed directory existence
         archiveDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.archiveParsedDir)
         if(archiveDirectoryExistenceCheck != "exists"):
-            self.log = writerInstance.appendText(self.log, " ")
-            self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            log.error( 'Error validating archive-parsed-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
         # make archiveParsed fileName dictionary
@@ -159,12 +167,13 @@ class Controller( object ):
         #parse -- blank files not copied to archiveParse, fileName removed from 'archiveOriginalToArchiveParsedDictionary' below
         parserInstance = Parser.Parser()
         parseCheck = parserInstance.parseFileDictionary(self.archiveOrigDir, self.archiveParsedDir, archiveOriginalToArchiveParsedDictionary)
-        self.log = writerInstance.appendText(self.log, " ")
         if (parseCheck != "success"):
-            self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
+            log.error( 'Error parsing file, ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
         else:
-            self.log = writerInstance.appendText(self.log, "Files processed: " + parserInstance.statusMessage + ".")
+            # self.log = writerInstance.appendText(self.log, "Files processed: " + parserInstance.statusMessage + ".")
+            log.info( 'Files parsed: ```{}```.'.format(parserInstance.statusMessage) )
 
         archiveOriginalToArchiveParsedDictionary = parserInstance.nonEmptiesDictionary
 
@@ -177,12 +186,15 @@ class Controller( object ):
 
         # copy to final destination
         finalFilecopyCheck = fileHandlerInstance.copyFileDictionary(archiveParsedToFinalDestinationDictionary, self.archiveParsedDir, self.destinationDir)
-        self.log = writerInstance.appendText(self.log, " ")
         if (finalFilecopyCheck != "success"):
-            self.log = writerInstance.appendText(self.log, "ERROR: Couldn't copy parsed files to '" + self.destinationDir + "'. Halting program.")
+            # self.log = writerInstance.appendText(self.log, "ERROR: Couldn't copy parsed files to '" + self.destinationDir + "'. Halting program.")
+            log.error( 'Error copying file to final destination, ```{}```. Halting program.'.format(self.destinationDir) )
             self.endProgram()
         else:
-            self.log = writerInstance.appendText(self.log, "Files ready for Josiah: " + fileHandlerInstance.statusMessage + ".")
+            # self.log = writerInstance.appendText(self.log, "Files ready for Josiah: " + fileHandlerInstance.statusMessage + ".")
+            message = 'Files ready for Josiah: ```{}```.'.format(fileHandlerInstance.statusMessage)
+            self.email_message = '\n{}\n'.format( message )
+            log.info( message )
             self.endProgram()
 
 
@@ -190,14 +202,15 @@ class Controller( object ):
     def endProgram(self):
         writerInstance = Writer.Writer()
         endText = writerInstance.obtainEndText()
-        finalLog = writerInstance.appendText(self.log, endText)
-        print finalLog
+        # finalLog = writerInstance.appendText(self.log, endText)
+        # print finalLog
+        self.email_message = '\n{}\n'.format( endText )
+        log.debug( 'ending program, ```{}```'.endText )
         # email notice if files found
         if(self.filesFound == True):
             emailerInstance = Emailer.Emailer()
-            message = finalLog
+            message = self.email_message
             emailerInstance.sendEmail(message)
-        import sys
         sys.exit()
 
 
