@@ -7,8 +7,8 @@ Part of LAS-to-Josiah code.
 Scan for existence of files.
 """
 
-import logging, os, pprint, string
-from annex_eod_project import NameConverter
+import logging, os, pprint, shutil, string, time
+# from annex_eod_project import NameConverter
 
 
 log = logging.getLogger(__name__)
@@ -39,6 +39,7 @@ class FileHandler( object ):
         if (directory.endswith("/") == False):
             directory = directory + "/"
         fileList = os.listdir(directory)
+        log.debug( 'fileList, ```{}```'.format(pprint.pformat(fileList)) )
         ## 1) eliminate .DS_Store & 2) eliminate directories
         newFileList = []
         for fileName in fileList:
@@ -50,7 +51,8 @@ class FileHandler( object ):
                     pass
                 else:
                     newFileList.append(fileName)
-        log.debug( 'scan-dir newFileList for dir, `{dir}` is, ```{lst}```'.format(dir=directory, lst=pprint.pformat(newFileList)) )
+        time.sleep( 1 )
+        log.debug( 'scan-dir newFileList for directory, `{dirZ}` is, ```{lstZ}```'.format(dirZ=directory, lstZ=pprint.pformat(newFileList)) )
         return newFileList
 
 
@@ -75,7 +77,7 @@ class FileHandler( object ):
 
     def copyFile(self, sourceFullPath, destinationFullPath):
 
-        import shutil
+        # import shutil
         shutil.copyfile(sourceFullPath, destinationFullPath)
 
         postCopyExistenceCheck = self.checkFileExistence(destinationFullPath)
@@ -94,7 +96,7 @@ class FileHandler( object ):
             file = open(fullFilePath)
         except:
             returnValue = "doesNotExist"
-            import os.path
+            # import os.path
             fileName=os.path.basename(fullFilePath)
             self.errorMessage = fileName
         else:
@@ -111,7 +113,7 @@ class FileHandler( object ):
 
         fileList = self.scanDirectory(directory)
 
-        import os
+        # import os
         for fileName in fileList:
             fullFileName = directory + fileName
             os.remove(fullFileName)
@@ -128,7 +130,8 @@ class FileHandler( object ):
 
     def copyFileDictionary(self, fileDictionary, sourceDirectory, destinationDirectory):
 
-        print '- in copyFileDictionary(); starting'
+        # print '- in copyFileDictionary(); starting'
+        log.debug( 'starting copyFileDictionary()' )
 
         if (sourceDirectory.endswith("/") == False):
             sourceDirectory = sourceDirectory + "/"
@@ -140,15 +143,18 @@ class FileHandler( object ):
             fullSourceFileName = sourceDirectory + sourceFileName
             fullDestinationFileName = destinationDirectory + fileDictionary[sourceFileName]
 
-            import os, shutil
-            print '- current directory...'; print os.getcwd()
-            print '- fullSourceFileName, `%s`; fullDestinationFileName, `%s`' % ( fullSourceFileName, fullDestinationFileName )
+            # import os, shutil
+            # print '- current directory...'; print os.getcwd()
+            log.debug( 'current directory, ```{}```'.format(os.getcwd()) )
+            # print '- fullSourceFileName, `%s`; fullDestinationFileName, `%s`' % ( fullSourceFileName, fullDestinationFileName )
+            log.debug( 'fullSourceFileName, ```{src}```; fullDestinationFileName, ```{dst}```'.format(src=fullSourceFileName, dst=fullDestinationFileName) )
             shutil.copy(fullSourceFileName, fullDestinationFileName)
-            print '- copied ok'
+            # print '- copied ok'
+            log.debug( 'copied ok' )
 
         # verify success and build listing of files ready for log & email
             # (first update destination directory to ensure it has a full-path instead of a relative-path)
-        import os
+        # import os
         fullDestinationDirectory = os.path.abspath(destinationDirectory) + "/" # fine if destinationDirectory is already complete
 
         returnValue = "init"
@@ -186,7 +192,7 @@ class FileHandler( object ):
     def deleteListFiles(self, fileList, directory):
 
         # delete
-        import os
+        # import os
         for fileName in fileList:
             fullFileName = directory + fileName
             os.remove(fullFileName)
