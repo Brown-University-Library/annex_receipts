@@ -129,91 +129,6 @@ class FileHandler:
 
 
 
-#	def copyFileList(self, fileList, sourceDirectory, destPrefix, destinationDirectory):
-#
-#		if (sourceDirectory.endswith("/") == False):
-#			sourceDirectory = sourceDirectory + "/"
-#		if (destinationDirectory.endswith("/") == False):
-#			destinationDirectory = destinationDirectory + "/"
-#
-#		for fileName in fileList:
-#			fullSourceFileName = sourceDirectory + fileName
-#			fullDestinationFileName = destinationDirectory + destPrefix + fileName
-#
-#			import shutil
-#			shutil.copy(fullSourceFileName, fullDestinationFileName)
-#
-#		# verify success
-#		originalFileList = fileList # just to keep things straight
-#		newFileList = self.scanDirectory(destinationDirectory)
-#		filesCopied = ""
-#		for originalFileName in originalFileList:
-#			try:
-#				indexTest = newFileList.index(originalFileName) # returns an index number if originalFileName is in newFileList -- it should be.
-#			except:
-#				returnValue = "failure"
-#				break
-#			else:
-#				returnValue = "success"
-#				if(filesCopied == ""):
-#					filesCopied = "'" + originalFileName + "'"
-#				else:
-#					filesCopied = filesCopied + ", '" + originalFileName + "'"
-#
-#		self.statusMessage = filesCopied
-#		return returnValue
-
-
-
-#	def copyFileDictionary(self, fileDictionary, sourceDirectory, destinationDirectory):
-#
-#		if (sourceDirectory.endswith("/") == False):
-#			sourceDirectory = sourceDirectory + "/"
-#		if (destinationDirectory.endswith("/") == False):
-#			destinationDirectory = destinationDirectory + "/"
-#
-#		for sourceFileName in fileDictionary.keys():
-#
-#			fullSourceFileName = sourceDirectory + sourceFileName
-#			fullDestinationFileName = destinationDirectory + fileDictionary[sourceFileName]
-#
-#			import shutil
-#			shutil.copy(fullSourceFileName, fullDestinationFileName)
-#
-#		# verify success and build listing of files ready for log & email
-#			# (first update destination directory to ensure it has a full-path instead of a relative-path)
-#		import os
-#		fullDestinationDirectory = os.path.abspath(destinationDirectory) + "/" # fine if destinationDirectory is already complete
-#
-#		returnValue = "init"
-#		filesCopied = ""
-#		for destinationFileName in fileDictionary.values():
-#			try:
-#				fullFilePath = fullDestinationDirectory + destinationFileName
-#				file = open(fullFilePath)
-#			except:
-#				returnValue = "failure"
-#				break
-#			else:
-#
-#				if(filesCopied == ""):
-#					filesCopied = "\n" + "'" + fullFilePath + "'" + "\n"
-#				else:
-#					filesCopied = filesCopied + "'" + fullFilePath + "'" + "\n"
-#
-#		# take off that final newline character
-#		lengthOfFilesCopiedString = len(filesCopied)
-#		charactersToChopForFinalNewline = 1
-#		charactersToKeep = lengthOfFilesCopiedString - charactersToChopForFinalNewline
-#		filesCopiedString = filesCopied[:charactersToKeep]
-#		self.statusMessage = filesCopiedString
-#
-#		if(returnValue == 'init'):
-#			returnValue = 'success'
-#		return returnValue
-
-
-
 	def copyFileDictionary(self, fileDictionary, sourceDirectory, destinationDirectory):
 
 		print '- in copyFileDictionary(); starting'
@@ -259,50 +174,6 @@ class FileHandler:
 		if(returnValue == 'init'):
 			returnValue = 'success'
 		return returnValue
-
-
-
-	# def copyFileDictionary(self, fileDictionary, sourceDirectory, destinationDirectory):
-
-	# 	if (sourceDirectory.endswith("/") == False):
-	# 		sourceDirectory = sourceDirectory + "/"
-	# 	if (destinationDirectory.endswith("/") == False):
-	# 		destinationDirectory = destinationDirectory + "/"
-
-	# 	for sourceFileName in fileDictionary.keys():
-
-	# 		fullSourceFileName = sourceDirectory + sourceFileName
-	# 		fullDestinationFileName = destinationDirectory + fileDictionary[sourceFileName]
-
-	# 		import shutil
-	# 		shutil.copy(fullSourceFileName, fullDestinationFileName)
-
-	# 	# verify success and build listing of files ready for log & email
-	# 		# (first update destination directory to ensure it has a full-path instead of a relative-path)
-	# 	import os
-	# 	fullDestinationDirectory = os.path.abspath(destinationDirectory) + "/" # fine if destinationDirectory is already complete
-
-	# 	returnValue = "init"
-	# 	filesCopiedList = []
-	# 	for destinationFileName in fileDictionary.values():
-	# 		try:
-	# 			fullFilePath = fullDestinationDirectory + destinationFileName
-	# 			file = open(fullFilePath)
-	# 		except:
-	# 			returnValue = "failure"
-	# 			break
-	# 		else:
-	# 			filesCopiedList.append("'" + fullFilePath + "'")
-
-	# 	filesCopiedList.sort()
-	# 	stringFromList = string.join(filesCopiedList, '\n')
-	# 	filesCopiedString = "\n" + stringFromList
-	# 	self.statusMessage = filesCopiedString
-
-	# 	if(returnValue == 'init'):
-	# 		returnValue = 'success'
-	# 	return returnValue
-
 
 
 
@@ -359,21 +230,6 @@ class FileHandler:
 
 		newList.sort()
 		return newList
-
-
-#		newList = []
-#
-#		for prefix in prefixList:
-#			for fileName in fileList:
-#				positionOfPrefix = string.find( fileName, prefix )   # haystack, needle. Will be -1 if not found
-#				positionOfCountIndicator = string.find(fileName, ".cnt")
-##				if ( (1 == 1) & (2==2) ):
-##					print "do something"
-#				if ( (positionOfPrefix != -1) & (positionOfCountIndicator == -1) ): # if (prefixes exist AND '.cnt' substring doesn't)
-#					newList.append(fileName)
-#
-#		newList.sort() # don't need to do this for the production code, but it makes the test easier.
-#		return newList
 
 
 
