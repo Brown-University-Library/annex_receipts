@@ -8,6 +8,7 @@ Handle sending of email when files are found.
 """
 
 import logging, smtplib
+from annex_eod_project import settings
 
 
 log = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ class Emailer( object ):
         self.headerCc = settings.MAIL_HEADERCC
         self.headerFrom = settings.MAIL_HEADERFROM
         self.headerSubject = settings.MAIL_SUBJECT
-        self.basicHeaderInfo = headerTo + "\n" + headerCc + "\n" + headerFrom + "\n" + headerSubject + "\n"
+        self.basicHeaderInfo = self.headerTo + "\n" + self.headerCc + "\n" + self.headerFrom + "\n" + self.headerSubject + "\n"
 
 
     def sendEmail(self, message):
