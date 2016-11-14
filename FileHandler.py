@@ -1,12 +1,13 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 """
 Part of LAS-to-Josiah code.
 Scan for existence of files.
 """
 
-
-
-import os
-import string
+import os, string
 
 import NameConverter
 
