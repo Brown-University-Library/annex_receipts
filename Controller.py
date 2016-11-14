@@ -85,7 +85,8 @@ Cron job starting at `{}`.
 
         ## 'checking' notice
         message = 'Checking for new file(s).'
-        self.email_message = '\n{}\n'.format( message )
+        # self.email_message = '\n{}\n'.format( message )
+        self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
         log.info( message )
 
         ## validate source-directory existence
@@ -109,7 +110,8 @@ Cron job starting at `{}`.
         self.filesFound = True
         # self.log = writerInstance.appendText(self.log, "File(s) found.")
         message = 'File(s) found.'
-        self.email_message = '\n{}\n'.format( message )
+        # self.email_message = '\n{}\n'.format( message )
+        self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
         log.info( message )
 
         #######
@@ -194,8 +196,9 @@ Cron job starting at `{}`.
             self.endProgram()
         else:
             # self.log = writerInstance.appendText(self.log, "Files ready for Josiah: " + fileHandlerInstance.statusMessage + ".")
-            message = 'Files ready for Josiah: ```{}```.'.format(fileHandlerInstance.statusMessage)
-            self.email_message = '\n{}\n'.format( message )
+            message = 'Files ready for Josiah: {}.'.format(fileHandlerInstance.statusMessage)
+            # self.email_message = '\n{}\n'.format( message )
+            self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
             log.info( message )
             self.endProgram()
 
@@ -211,7 +214,8 @@ Cron job ending at `{}`
         # endText = writerInstance.obtainEndText()
         # finalLog = writerInstance.appendText(self.log, endText)
         # print finalLog
-        self.email_message = '\n{}\n'.format( message )
+        # self.email_message = '\n{}\n'.format( message )
+        self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
         log.debug( 'ending program, ```{}```'.format(message) )
         ## email notice if files found
         if(self.filesFound == True):

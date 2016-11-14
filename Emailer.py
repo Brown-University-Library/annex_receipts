@@ -30,7 +30,6 @@ class Emailer( object ):
         self.headerSubject = settings.MAIL_SUBJECT
         self.basicHeaderInfo = self.headerTo + "\n" + self.headerCc + "\n" + self.headerFrom + "\n" + self.headerSubject + "\n"
 
-
     def sendEmail(self, message):
         session = smtplib.SMTP(self.smtpserver)
         if self.AUTHREQUIRED:
