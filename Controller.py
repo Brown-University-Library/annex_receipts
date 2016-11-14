@@ -26,31 +26,29 @@ ok- echo 'no file found'
 
 import getopt, logging, os, pprint, re, sys
 
-## add project directory to sys.path
+## add project parent-directory to sys.path
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
 from annex_eod_project import settings
-import ArgumentReader
-import DatePrepper
-import Emailer
-import FileHandler
-import NameConverter
-import Parser
-import Writer
+# from annex_eod_project import ArgumentReader
+# import DatePrepper
+# import Emailer
+# import FileHandler
+# import NameConverter
+# import Parser
+# import Writer
 
 logging.basicConfig(
+    # filename=settings.LOG_PATH,
     level=logging.DEBUG,
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
-log.info( 'script started' )
+# log.info( 'script started' )
 
 
-1/0
-
-
-# perceive the arguments sent in
+## perceive the arguments sent in
 opts, args = getopt.getopt(sys.argv[1:], 'd')   # I don't remember what the 'd' is for; look it up someday.
 
 
@@ -59,20 +57,22 @@ class Controller:
 
 
 
-    log = "init"
-    sourceDir = "init"
-    archiveOrigDir = "init"
-    archiveParsedDir = "init"
-    destinationDir = "init"
-    prefixList = ["QSACS","QSREF","QHACS", "QHREF"]
-    timeStamp = "init"
-    filesFound = "init" # true or false
+    # log = "init"
+    self.sourceDir = settings.SOURCE_DIR
+    self.archiveOrigDir = settings.ARCHIVE_ORIGINAL_DIR
+    self.archiveParsedDir = settings.ARCHIVE_PARSED_DIR
+    self.destinationDir = settings.DESTINATION_DIR
+    # prefixList = ["QSACS","QSREF","QHACS", "QHREF"]
+    self.prefixList = settings.PREFIX_LIST
+    self.timeStamp = "init"
+    self.filesFound = "init" # true or false
 
 
 
     def manageProcessing(self, args):
 
-        print '- in Controller.py, manageProcessing(); starting'
+        # print '- in Controller.py, manageProcessing(); starting'
+        log.info( 'starting' )
 
         # prepare the initial text indicating the script is running
         writerInstance = Writer.Writer()
