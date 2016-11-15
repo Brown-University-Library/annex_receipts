@@ -29,15 +29,16 @@ class Emailer( object ):
         self.headerFrom = settings.MAIL_HEADERFROM
         self.headerSubject = settings.MAIL_SUBJECT
         self.basicHeaderInfo = self.headerTo + "\n" + self.headerCc + "\n" + self.headerFrom + "\n" + self.headerSubject + "\n"
+        self.full_message = None
 
     def sendEmail(self, message):
+        self.full_message = self.update_full_message( message )
         session = smtplib.SMTP(self.smtpserver)
         if self.AUTHREQUIRED:
             session.login(self.smtpuser, self.smtppass)
         returnValue = "init"
-        fullMessage = self.basicHeaderInfo + message
         try:
-            smtpresult = session.sendmail(self.SENDER, self.RECIPIENTS, fullMessage)
+            smtpresult = session.sendmail( self.SENDER, self.RECIPIENTS, self.full_message )
             # if smtpresult:
             #     errorString = ""
             #     for recip in smtpresult.keys():
@@ -55,3 +56,9 @@ class Emailer( object ):
             session.quit()
             returnValue = "success"
         return returnValue
+
+    def update_full_message( self, message ):
+        """ Stores full message; for easy unit-testing without sending.
+            Called by sendEmail() """
+        self.full_message = self.basicHeaderInfo + message
+        return self.full_message

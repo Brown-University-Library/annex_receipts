@@ -2,10 +2,12 @@
 
 from __future__ import unicode_literals
 
-import datetime, logging, os, sys, unittest
+import datetime, logging, os, pprint, sys, unittest
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
+from annex_eod_project import settings
 from annex_eod_project.DatePrepper import DatePrepper
+from annex_eod_project.Emailer import Emailer
 
 """ To run tests:
     - activate v-env
@@ -16,6 +18,11 @@ from annex_eod_project.DatePrepper import DatePrepper
       python ./test.py DatePrepper_Test.test__prepareTimeStamp """
 
 
+logging.basicConfig(
+    # filename=settings.LOG_PATH,
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
+    datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)
 
 
@@ -36,6 +43,31 @@ class DatePrepper_Test(unittest.TestCase):
             )
 
     # end class DatePrepper_Test
+
+
+class Emailer_Test(unittest.TestCase):
+    """ Tests Emailer.py code. """
+
+    def setUp(self):
+        self.emlr = Emailer()
+
+    def test__update_full_message(self):
+        """ Tests full message. """
+        result = self.emlr.update_full_message( 'hello world' )
+        self.assertEquals( unicode, type(result) )
+        lines = result.split( '\n' )
+        log.debug( 'lines, ```{}```'.format(pprint.pformat(lines)) )
+        self.assertEquals( True, 'To:' in lines[0] )
+        self.assertEquals( True, settings.MAIL_HEADERTO in lines[0] )
+        self.assertEquals( True, 'Cc:' in lines[1] )
+        self.assertEquals( True, settings.MAIL_HEADERCC in lines[1] )
+        self.assertEquals( True, 'From:' in lines[2] )
+        self.assertEquals( True, settings.MAIL_HEADERFROM in lines[2] )
+        self.assertEquals( settings.MAIL_SUBJECT, lines[3] )
+        self.assertEquals( 'hello world', lines[4] )
+
+    # end class Emailer_Test
+
 
 
 
