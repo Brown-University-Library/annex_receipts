@@ -50,10 +50,6 @@ nameConverterInstance = NameConverter.NameConverter()
 parserInstance = Parser.Parser()
 
 
-## perceive the arguments sent in
-opts, args = getopt.getopt(sys.argv[1:], 'd')   # I don't remember what the 'd' is for; look it up someday.
-
-
 class Controller( object ):
 
     def __init__( self ):
@@ -70,17 +66,17 @@ class Controller( object ):
     def manageProcessing( self, args ):
 
         ## prepare the initial text indicating the script is running
+        self.timeStamp = datePrepperInstance.prepareTimeStamp()
         message = """
 -------
 
 Cron job starting at `{}`.
-""".format( unicode(datetime.datetime.now()) )
-
+""".format( self.timeStamp )
         self.email_message = message
         log.info( message )
 
         #######
-        # check for new files
+        ## check for new files
         #######
 
         ## 'checking' notice
@@ -97,28 +93,24 @@ Cron job starting at `{}`.
             log.error( 'Error validating source-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
-        # check for files
+        ## check for files
         log.debug( 'about to call scanDirectory()' )
         filesToExamineList = fileHandlerInstance.scanDirectory(self.sourceDir)
         log.debug( 'scanDirectory call done' )
-        # time.sleep( 1 )
         goodFileList = fileHandlerInstance.makeGoodList(self.prefixList, filesToExamineList)
         if ( goodFileList == [] ):
-            # self.log = writerInstance.appendText(self.log, "No files found.")
             log.info( 'No files found.' )
             self.endProgram()
         self.filesFound = True
-        # self.log = writerInstance.appendText(self.log, "File(s) found.")
         message = 'File(s) found.'
-        # self.email_message = '\n{}\n'.format( message )
         self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
         log.info( message )
 
         #######
-        # copy files to archive location
+        ## copy files to archive location
         #######
 
-        # validate archiveOrig directory existence
+        ## validate archiveOrig directory existence
         archiveDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.archiveOrigDir)
         if(archiveDirectoryExistenceCheck != "exists"):
             # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
@@ -126,57 +118,47 @@ Cron job starting at `{}`.
             self.endProgram()
 
         ## make archiveOrig fileName dictionary
-        # datePrepperInstance = DatePrepper.DatePrepper()
-        timeStamp = datePrepperInstance.prepareTimeStamp()
-        self.timeStamp = timeStamp
-        # nameConverterInstance = NameConverter.NameConverter()
         sourceToOriginalDictionary = nameConverterInstance.makeTrueOrigToArchiveOrigDictionary(goodFileList, self.timeStamp)
 
-        # copy files to archiveOrig
+        ## copy files to archiveOrig
         fileCopyCheck = fileHandlerInstance.copyFileDictionary(sourceToOriginalDictionary, self.sourceDir, self.archiveOrigDir)
         if (fileCopyCheck != "success"):
-            # self.log = writerInstance.appendText(self.log, "ERROR: Couldn't copy found files to archive_orig directory. Halting program.")
             log.error( 'ERROR: Couldn\'t copy found files to archive_orig directory. Halting program.' )
             self.endProgram()
 
         #######
-        # delete originals
+        ## delete originals
         #######
 
-        # delete files just saved from 'outbound'
+        ## delete files just saved from 'outbound'
         resultOfDeletion = fileHandlerInstance.deleteListFiles(goodFileList, self.sourceDir)
         if (resultOfDeletion != "success"):
-            # self.log = writerInstance.appendText(self.log, "ERROR: Couldn't delete original files: " + fileHandlerInstance.errorMessage + " Halting program.")
             log.error( 'ERROR: Couldn\'t delete original files: ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
-        # delete count files
+        ## delete count files
         countFileList = fileHandlerInstance.makeCountFileList(self.sourceDir, self.prefixList)
         fileHandlerInstance.deleteListFiles(countFileList, self.sourceDir)
 
         #######
-        # parse files
+        ## parse files
         #######
 
-        # validate archiveParsed directory existence
+        ## validate archiveParsed directory existence
         archiveDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.archiveParsedDir)
         if(archiveDirectoryExistenceCheck != "exists"):
-            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
             log.error( 'Error validating archive-parsed-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
 
-        # make archiveParsed fileName dictionary
+        ## make archiveParsed fileName dictionary
         archiveOriginalToArchiveParsedDictionary = nameConverterInstance.makeArchiveOrigToArchiveParsedDictionary(sourceToOriginalDictionary, self.timeStamp)
 
-        #parse -- blank files not copied to archiveParse, fileName removed from 'archiveOriginalToArchiveParsedDictionary' below
-        # parserInstance = Parser.Parser()
+        ## parse -- blank files not copied to archiveParse, fileName removed from 'archiveOriginalToArchiveParsedDictionary' below
         parseCheck = parserInstance.parseFileDictionary(self.archiveOrigDir, self.archiveParsedDir, archiveOriginalToArchiveParsedDictionary)
         if (parseCheck != "success"):
-            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
             log.error( 'Error parsing file, ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
             self.endProgram()
         else:
-            # self.log = writerInstance.appendText(self.log, "Files processed: " + parserInstance.statusMessage + ".")
             message = 'Files processed: {}.'.format(parserInstance.statusMessage)
             self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
             log.info( message )
@@ -184,44 +166,33 @@ Cron job starting at `{}`.
         archiveOriginalToArchiveParsedDictionary = parserInstance.nonEmptiesDictionary
 
         #######
-        # copy parsed files to destination
+        ## copy parsed files to destination
         #######
 
-        # get finalDestination dictionary prepared in the 'parse' step above (with blank files removed).
+        ## get finalDestination dictionary prepared in the 'parse' step above (with blank files removed).
         archiveParsedToFinalDestinationDictionary = nameConverterInstance.prepareFinalDestinationDictionary(archiveOriginalToArchiveParsedDictionary, self.destinationDir)
 
-        # copy to final destination
+        ## copy to final destination
         finalFilecopyCheck = fileHandlerInstance.copyFileDictionary(archiveParsedToFinalDestinationDictionary, self.archiveParsedDir, self.destinationDir)
         if (finalFilecopyCheck != "success"):
-            # self.log = writerInstance.appendText(self.log, "ERROR: Couldn't copy parsed files to '" + self.destinationDir + "'. Halting program.")
             log.error( 'Error copying file to final destination, ```{}```. Halting program.'.format(self.destinationDir) )
             self.endProgram()
         else:
-            # self.log = writerInstance.appendText(self.log, "Files ready for Josiah: " + fileHandlerInstance.statusMessage + ".")
             message = 'Files ready for Josiah: {}.'.format(fileHandlerInstance.statusMessage)
-            # self.email_message = '\n{}\n'.format( message )
             self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
             log.info( message )
             self.endProgram()
 
-
-
     def endProgram(self):
-        # writerInstance = Writer.Writer()
         message = """
 Cron job ending at `{}`
 
 -------
 """.format( unicode(datetime.datetime.now()) )
-        # endText = writerInstance.obtainEndText()
-        # finalLog = writerInstance.appendText(self.log, endText)
-        # print finalLog
-        # self.email_message = '\n{}\n'.format( message )
         self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
         log.debug( 'ending program, ```{}```'.format(message) )
         ## email notice if files found
         if(self.filesFound == True):
-            # emailerInstance = Emailer.Emailer()
             message = self.email_message
             log.debug( 'sending email, message, ```{}```'.format(message) )
             emailerInstance.sendEmail(message)
@@ -230,5 +201,5 @@ Cron job ending at `{}`
 
 
 if __name__ == '__main__':
-    someClassInstance = Controller()
-    someClassInstance.manageProcessing(args)
+    cntrllr = Controller()
+    cntrllr.manageProcessing()
