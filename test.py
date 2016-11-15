@@ -8,6 +8,7 @@ sys.path.append( parent_working_dir )
 from annex_eod_project import settings
 from annex_eod_project.DatePrepper import DatePrepper
 from annex_eod_project.Emailer import Emailer
+from annex_eod_project.FileHandler import FileHandler
 
 """ To run tests:
     - activate v-env
@@ -68,6 +69,18 @@ class Emailer_Test(unittest.TestCase):
 
     # end class Emailer_Test
 
+
+class FileHandler_Test(unittest.TestCase):
+    """ Tests FileHandler.py code. """
+
+    def setUp(self):
+        self.flhndlr = FileHandler()
+
+    def test__foo(self):
+        """ Tests foo. """
+        self.assertEquals( '1 world', '2' )
+
+    # end class FileHandler_Test
 
 
 
