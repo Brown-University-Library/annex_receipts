@@ -29,10 +29,9 @@ class DatePrepper(object):
         return formattedTime
 
     def prepareTimeStamp(self):
-        # import time
         if( len(self.timeToFormat) == 0):
             theTime = time.localtime()
         else:
             theTime = self.timeToFormat
         formattedTime = time.strftime("%Y-%m-%dT%H-%M-%S", theTime)
-        return formattedTime
+        return unicode( formattedTime )
