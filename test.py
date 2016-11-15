@@ -76,9 +76,14 @@ class FileHandler_Test(unittest.TestCase):
     def setUp(self):
         self.flhndlr = FileHandler()
 
-    def test__foo(self):
-        """ Tests foo. """
-        self.assertEquals( '1 world', '2' )
+    def test__scanDirectory(self):
+        """ Tests list of files returned. """
+        cwd = os.path.abspath( os.getcwd() )
+        log.debug( 'cwd, ```{}```'.format(cwd) )
+        result = self.flhndlr.scanDirectory( cwd )
+        self.assertEquals( list, type(result) )
+        self.assertEquals( True, '.DS_Store' not in result )  # cleaned file
+        self.assertEquals( True, '.git' not in result )  # directories removed
 
     # end class FileHandler_Test
 
