@@ -63,7 +63,7 @@ class Controller( object ):
         self.filesFound = "init" # will be True or False
         self.email_message = ''
 
-    def manageProcessing( self, args ):
+    def manageProcessing( self ):
 
         ## prepare the initial text indicating the script is running
         self.timeStamp = datePrepperInstance.prepareTimeStamp()
@@ -188,7 +188,7 @@ Cron job starting at `{}`.
 Cron job ending at `{}`
 
 -------
-""".format( unicode(datetime.datetime.now()) )
+""".format( datePrepperInstance.prepareTimeStamp() )
         self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
         log.debug( 'ending program, ```{}```'.format(message) )
         ## email notice if files found
