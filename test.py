@@ -85,6 +85,14 @@ class FileHandler_Test(unittest.TestCase):
         self.assertEquals( True, '.DS_Store' not in result )  # cleaned file
         self.assertEquals( True, '.git' not in result )  # directories removed
 
+    def test__makeGoodList(self):
+        """ Tests further cleaning of filepath lists. """
+        prefix_list = settings.PREFIX_LIST  # Our list of prefix codes indicate whether the end-of-day reports are for re-accessions or returns, and whether they're for general, or restricted circulation items.
+        file_list = [ 'a.txt', 'a.cnt', 'b.txt', 'b.cnt', 'QSREF.txt', 'QSREF.cnt' ]
+        self.assertEquals(
+            ['QSREF.txt'], self.flhndlr.makeGoodList( prefix_list, file_list )
+            )
+
     # end class FileHandler_Test
 
 
