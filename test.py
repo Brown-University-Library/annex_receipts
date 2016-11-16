@@ -127,6 +127,14 @@ class NameConverter_Test(unittest.TestCase):
         self.assertEquals(
             'QHREF_0713.txt', self.nmcnvrtr.convertInputToOriginal(filename) )
 
+    def test_prepareFinalDestinationDictionary(self):
+        """ Tests de-conversion of extended filename back into original filename. """
+        original_to_parsed_dct = {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'}
+        destination_dir = settings.DESTINATION_DIR
+        self.assertEquals(
+            {u'PARSED_QHACS_2005-07-13T13-41-39.dat': u'qhacs0713.txt', u'PARSED_QHREF_2005-07-13T13-41-39.dat': u'qhref0713.txt'},
+            self.nmcnvrtr.prepareFinalDestinationDictionary(original_to_parsed_dct, destination_dir) )
+
     # end class NameConverter_Test
 
 
