@@ -2,13 +2,14 @@
 
 from __future__ import unicode_literals
 
-import datetime, logging, os, pprint, sys, unittest
+import datetime, logging, os, pprint, sys, time, unittest
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 from annex_eod_project import settings
 from annex_eod_project.DatePrepper import DatePrepper
 from annex_eod_project.Emailer import Emailer
 from annex_eod_project.FileHandler import FileHandler
+from annex_eod_project.NameConverter import NameConverter
 
 """ To run tests:
     - activate v-env
@@ -86,7 +87,7 @@ class FileHandler_Test(unittest.TestCase):
         self.assertEquals( True, '.git' not in result )  # directories removed
 
     def test__makeGoodList(self):
-        """ Tests further cleaning of filepath lists. """
+        """ Tests filter for valid data-file from file-list. """
         prefix_list = settings.PREFIX_LIST  # Our list of prefix codes indicate whether the end-of-day reports are for re-accessions or returns, and whether they're for general, or restricted circulation items.
         file_list = [ 'a.txt', 'a.cnt', 'b.txt', 'b.cnt', 'QSREF.txt', 'QSREF.cnt' ]
         self.assertEquals(
@@ -95,6 +96,22 @@ class FileHandler_Test(unittest.TestCase):
 
     # end class FileHandler_Test
 
+
+class NameConverter_Test(unittest.TestCase):
+    """ Tests NameConverter.py code. """
+
+    def setUp(self):
+        self.nmcnvrtr = NameConverter()
+
+    def test_makeTrueOrigToArchiveOrigDictionary(self):
+        formatted_time = unicode( time.strftime(
+            '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
+        file_list = [ 'QHACS_1110.txt', 'QHREF_1110.txt' ]
+        self.assertEquals(
+            {u'QHACS_1110.txt': u'ORIG_QHACS_2005-07-13T13-41-39.dat', u'QHREF_1110.txt': u'ORIG_QHREF_2005-07-13T13-41-39.dat'},
+            self.nmcnvrtr.makeTrueOrigToArchiveOrigDictionary(file_list, formatted_time) )
+
+    # end class NameConverter_Test
 
 
 

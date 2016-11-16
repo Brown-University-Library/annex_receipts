@@ -179,13 +179,13 @@ class FileHandler( object ):
         return returnValue
 
 
-
-    def makeFilesToParseList(self, fileList):
-        for fileName in fileList:
-            indexNumber = fileList.index(fileName)
-            fileName = "archive_" + fileName
-            fileList[indexNumber] = fileName
-        return fileList
+    ## 2016-Nov-16: doesn't look like this function's used; delete after 2016-Dec-16
+    # def makeFilesToParseList(self, fileList):
+    #     for fileName in fileList:
+    #         indexNumber = fileList.index(fileName)
+    #         fileName = "archive_" + fileName
+    #         fileList[indexNumber] = fileName
+    #     return fileList
 
 
 
