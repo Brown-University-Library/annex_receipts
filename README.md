@@ -18,7 +18,7 @@ Items are arrive at our offsite storage facility, the [Annex](http://library.bro
 
 This code...
 
-- processes one of the standard end-of-day reports output by the the [GFA software](http://www.gfatech.com/software-LAS.html)
+- processes the standard end-of-day reports output by the the [GFA software](http://www.gfatech.com/software-LAS.html)
 - creates files for catalogers to access via ftp
 - emails the catalogers that the new files are ready
 - the catalogers then access the files, and update our [III Millennium ILS](https://www.iii.com/products/millennium)
