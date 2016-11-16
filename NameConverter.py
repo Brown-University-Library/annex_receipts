@@ -76,15 +76,16 @@ class NameConverter( object ):
 
 
 
-    def makeSameNameDictionary(self, inputList):
+    ## 2016-Nov-16: code unused; delete 2016-Dec-16
+    # def makeSameNameDictionary(self, inputList):
 
-        builtDict = {}
-        for fileName in inputList:
-            key = fileName
-            value = fileName
-            builtDict[key] = value
+    #     builtDict = {}
+    #     for fileName in inputList:
+    #         key = fileName
+    #         value = fileName
+    #         builtDict[key] = value
 
-        return builtDict
+    #     return builtDict
 
 
 
