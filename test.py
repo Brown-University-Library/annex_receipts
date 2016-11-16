@@ -104,6 +104,7 @@ class NameConverter_Test(unittest.TestCase):
         self.nmcnvrtr = NameConverter()
 
     def test_makeTrueOrigToArchiveOrigDictionary(self):
+        """ Tests adding timestamp and prefix to original filename. """
         formatted_time = unicode( time.strftime(
             '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
         file_list = [ 'QHACS_1110.txt', 'QHREF_1110.txt' ]
@@ -112,12 +113,19 @@ class NameConverter_Test(unittest.TestCase):
             self.nmcnvrtr.makeTrueOrigToArchiveOrigDictionary(file_list, formatted_time) )
 
     def test_makeArchiveOrigToArchiveParsedDictionary(self):
+        """ Tests creation of original-to-parsed filename dictionary. """
         formatted_time = unicode( time.strftime(
             '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
         input_dct = {u'QHACS_1110.txt': u'ORIG_QHACS_2005-07-13T13-41-39.dat', u'QHREF_1110.txt': u'ORIG_QHREF_2005-07-13T13-41-39.dat'}
         self.assertEquals(
             {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'},
             self.nmcnvrtr.makeArchiveOrigToArchiveParsedDictionary(input_dct, formatted_time) )
+
+    def test_convertInputToOriginal(self):
+        """ Tests de-conversion of extended filename back into original filename. """
+        filename = 'PARSED_QHREF_2005-07-13T13-41-39.dat'
+        self.assertEquals(
+            'QHREF_0713.txt', self.nmcnvrtr.convertInputToOriginal(filename) )
 
     # end class NameConverter_Test
 
