@@ -9,7 +9,7 @@ on this page...
 
 ### Qualifier ###
 
-This is ancient code recently updated a bit. It was one of my first python projects; there's still lots of evidence of my camelCase java background.
+This is ancient code recently updated just enough to release publicly. It was one of my first python projects; there's still lots of evidence of my camelCase everything's-a-class java background.
 
 
 ### Code/Context overview ###
