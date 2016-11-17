@@ -67,11 +67,18 @@ class Controller( object ):
 
         ## prepare the initial text indicating the script is running
         self.timeStamp = datePrepperInstance.prepareTimeStamp()
+#         message = """
+# -------
+
+# Cron job starting at `{}`.
+# """.format( self.timeStamp )
+#         self.email_message = message
+#         log.info( message )
         message = """
 -------
 
-Cron job starting at `{}`.
-""".format( self.timeStamp )
+Cron job starting at `%s`.
+""" % self.timeStamp
         self.email_message = message
         log.info( message )
 
@@ -81,16 +88,16 @@ Cron job starting at `{}`.
 
         ## 'checking' notice
         message = 'Checking for new file(s).'
-        # self.email_message = '\n{}\n'.format( message )
-        self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
+        # self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
+        self.email_message = '%s\n%s' % ( self.email_message, message )
         log.info( message )
 
         ## validate source-directory existence
         fileHandlerInstance = FileHandler.FileHandler()
         sourceDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.sourceDir)
         if(sourceDirectoryExistenceCheck != "exists"):
-            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
-            log.error( 'Error validating source-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
+            # log.error( 'Error validating source-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
+            log.error( 'Error validating source-directory existence, ```%s```' % fileHandlerInstance.errorMessage )
             self.endProgram()
 
         ## check for files
@@ -103,7 +110,8 @@ Cron job starting at `{}`.
             self.endProgram()
         self.filesFound = True
         message = 'File(s) found.'
-        self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+        # self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+        self.email_message = '%s\n\n%s' % ( self.email_message, message )
         log.info( message )
 
         #######
@@ -113,8 +121,8 @@ Cron job starting at `{}`.
         ## validate archiveOrig directory existence
         archiveDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.archiveOrigDir)
         if(archiveDirectoryExistenceCheck != "exists"):
-            # self.log = writerInstance.appendText(self.log, fileHandlerInstance.errorMessage)
-            log.error( 'Error validating archive-original-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
+            # log.error( 'Error validating archive-original-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
+            log.error( 'Error validating archive-original-directory existence, ```%s```' % fileHandlerInstance.errorMessage )
             self.endProgram()
 
         ## make archiveOrig fileName dictionary
@@ -133,7 +141,8 @@ Cron job starting at `{}`.
         ## delete files just saved from 'outbound'
         resultOfDeletion = fileHandlerInstance.deleteListFiles(goodFileList, self.sourceDir)
         if (resultOfDeletion != "success"):
-            log.error( 'ERROR: Couldn\'t delete original files: ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
+            # log.error( 'ERROR: Couldn\'t delete original files: ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
+            log.error( 'ERROR: Couldn\'t delete original files: ```%s```. Halting program.' % fileHandlerInstance.errorMessage )
             self.endProgram()
 
         ## delete count files
@@ -147,7 +156,8 @@ Cron job starting at `{}`.
         ## validate archiveParsed directory existence
         archiveDirectoryExistenceCheck = fileHandlerInstance.checkDirectoryExistence(self.archiveParsedDir)
         if(archiveDirectoryExistenceCheck != "exists"):
-            log.error( 'Error validating archive-parsed-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
+            # log.error( 'Error validating archive-parsed-directory existence, ```{}```'.format(fileHandlerInstance.errorMessage) )
+            log.error( 'Error validating archive-parsed-directory existence, ```%s```' % fileHandlerInstance.errorMessage )
             self.endProgram()
 
         ## make archiveParsed fileName dictionary
@@ -156,11 +166,14 @@ Cron job starting at `{}`.
         ## parse -- blank files not copied to archiveParse, fileName removed from 'archiveOriginalToArchiveParsedDictionary' below
         parseCheck = parserInstance.parseFileDictionary(self.archiveOrigDir, self.archiveParsedDir, archiveOriginalToArchiveParsedDictionary)
         if (parseCheck != "success"):
-            log.error( 'Error parsing file, ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
+            # log.error( 'Error parsing file, ```{}```. Halting program.'.format(fileHandlerInstance.errorMessage) )
+            log.error( 'Error parsing file, ```%s```. Halting program.' % fileHandlerInstance.errorMessage )
             self.endProgram()
         else:
-            message = 'Files processed: {}.'.format(parserInstance.statusMessage)
-            self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+            # message = 'Files processed: {}.'.format(parserInstance.statusMessage)
+            message = 'Files processed: %s.' % parserInstance.statusMessage
+            # self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+            self.email_message = '%s\n\n%s' % ( self.email_message, message )
             log.info( message )
 
         archiveOriginalToArchiveParsedDictionary = parserInstance.nonEmptiesDictionary
@@ -175,26 +188,38 @@ Cron job starting at `{}`.
         ## copy to final destination
         finalFilecopyCheck = fileHandlerInstance.copyFileDictionary(archiveParsedToFinalDestinationDictionary, self.archiveParsedDir, self.destinationDir)
         if (finalFilecopyCheck != "success"):
-            log.error( 'Error copying file to final destination, ```{}```. Halting program.'.format(self.destinationDir) )
+            # log.error( 'Error copying file to final destination, ```{}```. Halting program.'.format(self.destinationDir) )
+            log.error( 'Error copying file to final destination, ```%s```. Halting program.' % self.destinationDir )
             self.endProgram()
         else:
-            message = 'Files ready for Josiah: {}.'.format(fileHandlerInstance.statusMessage)
-            self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+            # message = 'Files ready for Josiah: {}.'.format(fileHandlerInstance.statusMessage)
+            message = 'Files ready for Josiah: %s.' % fileHandlerInstance.statusMessage
+            # self.email_message = '{prv}\n\n{msg}'.format( prv=self.email_message, msg=message )
+            self.email_message = '%s\n\n%s' % ( self.email_message, message )
             log.info( message )
             self.endProgram()
 
     def endProgram(self):
+#         message = """
+# Cron job ending at `{}`
+
+# -------
+# """.format( datePrepperInstance.prepareTimeStamp() )
         message = """
-Cron job ending at `{}`
+Cron job ending at `%s`
 
 -------
-""".format( datePrepperInstance.prepareTimeStamp() )
-        self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
-        log.debug( 'ending program, ```{}```'.format(message) )
+""" % datePrepperInstance.prepareTimeStamp()
+
+        # self.email_message = '{prv}\n{msg}'.format( prv=self.email_message, msg=message )
+        self.email_message = '%s\n%s' % ( self.email_message, message )
+        # log.debug( 'ending program, ```{}```'.format(message) )
+        log.debug( 'ending program, ```%s```' % message )
         ## email notice if files found
         if(self.filesFound == True):
             message = self.email_message
-            log.debug( 'sending email, message, ```{}```'.format(message) )
+            # log.debug( 'sending email, message, ```{}```'.format(message) )
+            log.debug( 'sending email, message, ```%s```' % message )
             emailerInstance.sendEmail(message)
         sys.exit()
 
