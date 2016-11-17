@@ -27,7 +27,8 @@ class FileHandler( object ):
         else:
             returnValue = "doesNotExist"
             self.errorMessage = "The directory '" + directory + "' does not exist."
-        log.debug( 'existence-check for dir `{dir}` has returnValue, `{val}`'.format(dir=directory, val=returnValue) )
+        # log.debug( 'existence-check for dir `{dir}` has returnValue, `{val}`'.format(dir=directory, val=returnValue) )
+        log.debug( 'existence-check for dir `%s` has returnValue, `%s`' % (directory, returnValue) )
         return returnValue
 
     def scanDirectory( self, directory ):
@@ -36,11 +37,11 @@ class FileHandler( object ):
         if (directory.endswith("/") == False):
             directory = directory + "/"
         fileList = os.listdir(directory)
-        log.debug( 'fileList, ```{}```'.format(pprint.pformat(fileList)) )
+        # log.debug( 'fileList, ```{}```'.format(pprint.pformat(fileList)) )
+        log.debug( 'fileList, ```%s```' % pprint.pformat(fileList) )
         ## 1) eliminate .DS_Store & 2) eliminate directories
         newFileList = []
         for fileName in fileList:
-            # log.debug( 'in for loop' )
             if(fileName == ".DS_Store"):
                 pass
             else:
@@ -49,8 +50,8 @@ class FileHandler( object ):
                     pass
                 else:
                     newFileList.append(fileName)
-        # time.sleep( 1 )
-        log.debug( 'scan-dir newFileList for directory, `{dirZ}` is, ```{lstZ}```'.format(dirZ=directory, lstZ=pprint.pformat(newFileList)) )
+        # log.debug( 'scan-dir newFileList for directory, `{dirZ}` is, ```{lstZ}```'.format(dirZ=directory, lstZ=pprint.pformat(newFileList)) )
+        log.debug( 'scan-dir newFileList for directory, `%s` is, ```%s```' % (directory, pprint.pformat(newFileList)) )
         return newFileList
 
 
@@ -143,13 +144,11 @@ class FileHandler( object ):
             fullSourceFileName = sourceDirectory + sourceFileName
             fullDestinationFileName = destinationDirectory + fileDictionary[sourceFileName]
 
-            # import os, shutil
-            # print '- current directory...'; print os.getcwd()
-            log.debug( 'current directory, ```{}```'.format(os.getcwd()) )
-            # print '- fullSourceFileName, `%s`; fullDestinationFileName, `%s`' % ( fullSourceFileName, fullDestinationFileName )
-            log.debug( 'fullSourceFileName, ```{src}```; fullDestinationFileName, ```{dst}```'.format(src=fullSourceFileName, dst=fullDestinationFileName) )
+            # log.debug( 'current directory, ```{}```'.format(os.getcwd()) )
+            log.debug( 'current directory, ```%s```' % os.getcwd() )
+            # log.debug( 'fullSourceFileName, ```{src}```; fullDestinationFileName, ```{dst}```'.format(src=fullSourceFileName, dst=fullDestinationFileName) )
+            log.debug( 'fullSourceFileName, ```%s```; fullDestinationFileName, ```%s```' % (fullSourceFileName, fullDestinationFileName) )
             shutil.copy(fullSourceFileName, fullDestinationFileName)
-            # print '- copied ok'
             log.debug( 'copied ok' )
 
         # verify success and build listing of files ready for log & email
