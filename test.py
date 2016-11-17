@@ -20,9 +20,10 @@ from annex_eod_project.NameConverter import NameConverter
       python ./test.py DatePrepper_Test.test__prepareTimeStamp """
 
 
+lvl_dct = { 'D': logging.DEBUG, 'I': logging.INFO, 'E': logging.ERROR }
 logging.basicConfig(
-    # filename=settings.LOG_PATH,
-    level=logging.DEBUG,
+    filename=settings.LOG_PATH,
+    level=lvl_dct[ settings.LOG_LEVEL ],
     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
     datefmt='%d/%b/%Y %H:%M:%S' )
 log = logging.getLogger(__name__)

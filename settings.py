@@ -5,6 +5,8 @@ import json, os
 
 
 LOG_PATH = unicode( os.environ['ANXEOD__LOG_PATH'] )
+LOG_LEVEL = unicode( os.environ['ANXEOD__LOG_LEVEL'] )
+assert LOG_LEVEL in [ 'D', 'I', 'E' ]  # debug, info, error
 
 SOURCE_DIR = unicode( os.environ['ANXEOD__SOURCE_DIR_PATH'] )                       # should end in '/'
 ARCHIVE_ORIGINAL_DIR = unicode( os.environ['ANXEOD__ARCHIVE_ORIGINAL_DIR_PATH'] )   # should end in '/'
