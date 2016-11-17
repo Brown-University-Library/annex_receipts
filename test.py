@@ -58,7 +58,8 @@ class Emailer_Test(unittest.TestCase):
         result = self.emlr.update_full_message( 'hello world' )
         self.assertEquals( unicode, type(result) )
         lines = result.split( '\n' )
-        log.debug( 'lines, ```{}```'.format(pprint.pformat(lines)) )
+        # log.debug( 'lines, ```{}```'.format(pprint.pformat(lines)) )
+        log.debug( 'lines, ```%s```' % pprint.pformat(lines) )
         self.assertEquals( True, 'To:' in lines[0] )
         self.assertEquals( True, settings.MAIL_HEADERTO in lines[0] )
         self.assertEquals( True, 'Cc:' in lines[1] )
@@ -80,7 +81,8 @@ class FileHandler_Test(unittest.TestCase):
     def test__scanDirectory(self):
         """ Tests list of files returned. """
         cwd = os.path.abspath( os.getcwd() )
-        log.debug( 'cwd, ```{}```'.format(cwd) )
+        # log.debug( 'cwd, ```{}```'.format(cwd) )
+        log.debug( 'cwd, ```%s```' % cwd )
         result = self.flhndlr.scanDirectory( cwd )
         self.assertEquals( list, type(result) )
         self.assertEquals( True, '.DS_Store' not in result )  # cleaned file

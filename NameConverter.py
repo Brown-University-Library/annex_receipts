@@ -15,8 +15,6 @@ log = logging.getLogger(__name__)
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 
-# log.debug( 'sys.path, {}'.format(pprint.pformat(sys.path)) )
-
 from annex_eod_project import FileHandler
 
 
