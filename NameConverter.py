@@ -7,7 +7,7 @@ Part of LAS-to-Josiah code.
 Convert names.
 """
 
-import logging, os, pprint, string, sys
+import datetime, logging, os, pprint, string, sys
 
 log = logging.getLogger(__name__)
 
@@ -74,72 +74,78 @@ class NameConverter( object ):
 
 
 
-    ## 2016-Nov-16: code unused; delete 2016-Dec-16
-    # def makeSameNameDictionary(self, inputList):
+    def prepareFinalDestinationDictionary(self, archive_original_to_archive_parsed_dictionary, destination_directory):
+        """ Takes  most recently used dictionary (with references to empty files removed)
+                and creates the new dictionary for copying the parsed files to their final destination.
+            Also checks for pre-existing files, and if found, appends a suffix to the file name to prevent overwriting.
+            Called by Controller.py """
+        ( built_dct, now ) = ( {}, datetime.datetime.now() )
+        for filename in archive_original_to_archive_parsed_dictionary.values():
+            key = filename  # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
+            root = filename[7:12].lower()
+            year_str = unicode( now.year )
+            month_str = filename[18:20]  # two-digit month
+            day_str = filename[21:23]  # two-digit day
+            new_filename = '{rt}_{y}-{m}-{d}.txt'.format( rt=root, y=year_str, m=month_str, d=day_str )
+            built_dct[key] = new_filename
+        log.debug( 'built_dct, ```{0}```'.format( pprint.pformat(built_dct) ) )
+        return built_dct
 
-    #     builtDict = {}
-    #     for fileName in inputList:
-    #         key = fileName
-    #         value = fileName
-    #         builtDict[key] = value
-
-    #     return builtDict
 
 
+#     def prepareFinalDestinationDictionary(self, archiveOriginalToArchiveParsedDictionary, destinationDirectory):
+#         '''
+#         - Takes the most recently used dictionary (with references to empty files removed) and creates the new dictionary for
+#         copying the parsed files to their final destination.
+#         - Also checks for pre-existing files, and if found, appends a suffix to the file name to prevent overwriting.
+#         '''
+#         builtDict = {}
+#         for parsedFileName in archiveOriginalToArchiveParsedDictionary.values():
 
-    def prepareFinalDestinationDictionary(self, archiveOriginalToArchiveParsedDictionary, destinationDirectory):
-        '''
-        - Takes the most recently used dictionary (with references to empty files removed) and creates the new dictionary for
-        copying the parsed files to their final destination.
-        - Also checks for pre-existing files, and if found, appends a suffix to the file name to prevent overwriting.
-        '''
-        builtDict = {}
-        for parsedFileName in archiveOriginalToArchiveParsedDictionary.values():
+#             key = parsedFileName # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
 
-            key = parsedFileName # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
+#             root = parsedFileName[7:12]
+#             # import string
+#             root = string.lower(root)
 
-            root = parsedFileName[7:12]
-            # import string
-            root = string.lower(root)
+#             month = parsedFileName[18:20]
+#             day = parsedFileName[21:23]
 
-            month = parsedFileName[18:20]
-            day = parsedFileName[21:23]
+#             basicCreatedName = root + month + day + ".txt" # this will be the destinationFileName *if* the file doesn't already exist.
 
-            basicCreatedName = root + month + day + ".txt" # this will be the destinationFileName *if* the file doesn't already exist.
+#             # check for existence of pre-existing files with same root name.
+# #               Remember, I'm iterating through a list now.
+# #               The logic is that I start a loop, take my basicCreatedName and look for a match anywhere in the destinationDirectory.
+# #               If no match, I'm golden (add to new dict), but if there is a match, add a suffix_number to the basicCreatedName and
+# #               check again for a match in the destinationDirectory.
 
-            # check for existence of pre-existing files with same root name.
-#               Remember, I'm iterating through a list now.
-#               The logic is that I start a loop, take my basicCreatedName and look for a match anywhere in the destinationDirectory.
-#               If no match, I'm golden (add to new dict), but if there is a match, add a suffix_number to the basicCreatedName and
-#               check again for a match in the destinationDirectory.
+#             fileHandlerInstance = FileHandler.FileHandler()
+#             log.debug( 'calling scanDirectory()' )
+#             destinationFileList = fileHandlerInstance.scanDirectory(destinationDirectory)
 
-            fileHandlerInstance = FileHandler.FileHandler()
-            log.debug( 'calling scanDirectory()' )
-            destinationFileList = fileHandlerInstance.scanDirectory(destinationDirectory)
+#             hopefulFinalName = basicCreatedName
+#             suffixNumeral = 1
+#             flag = "continue"
+#             sanityCheck = 0
+#             while ( (flag == "continue") & (sanityCheck < 1000) ):
+#                 sanityCheck = sanityCheck + 1 # no endless loops while developing
 
-            hopefulFinalName = basicCreatedName
-            suffixNumeral = 1
-            flag = "continue"
-            sanityCheck = 0
-            while ( (flag == "continue") & (sanityCheck < 1000) ):
-                sanityCheck = sanityCheck + 1 # no endless loops while developing
+#                 comparisonResult = "initialize"
+#                 for existingFileName in destinationFileList:
+#                     if (existingFileName == hopefulFinalName):
+#                         comparisonResult = "matchFound"
 
-                comparisonResult = "initialize"
-                for existingFileName in destinationFileList:
-                    if (existingFileName == hopefulFinalName):
-                        comparisonResult = "matchFound"
+#                 if (comparisonResult == "initialize"):
+#                     realFinalName = hopefulFinalName
+#                     flag = "stop"
+#                 else: # life is trickier
+#                     suffixNumeral = suffixNumeral + 1
+#                     hopefulFinalName = basicCreatedName + "_" + str(suffixNumeral)
 
-                if (comparisonResult == "initialize"):
-                    realFinalName = hopefulFinalName
-                    flag = "stop"
-                else: # life is trickier
-                    suffixNumeral = suffixNumeral + 1
-                    hopefulFinalName = basicCreatedName + "_" + str(suffixNumeral)
+#             # overwrite check done, new destination file name ready; update dictionary
+#             builtDict[key] = realFinalName
 
-            # overwrite check done, new destination file name ready; update dictionary
-            builtDict[key] = realFinalName
-
-        return builtDict
+#         return builtDict
 
 
 
