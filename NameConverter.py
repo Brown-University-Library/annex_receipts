@@ -73,23 +73,41 @@ class NameConverter( object ):
         return returnValue
 
 
-
     def prepareFinalDestinationDictionary(self, archive_original_to_archive_parsed_dictionary, destination_directory):
         """ Takes  most recently used dictionary (with references to empty files removed)
                 and creates the new dictionary for copying the parsed files to their final destination.
             Also checks for pre-existing files, and if found, appends a suffix to the file name to prevent overwriting.
             Called by Controller.py """
-        ( built_dct, now ) = ( {}, datetime.datetime.now() )
+        built_dct = {}
         for filename in archive_original_to_archive_parsed_dictionary.values():
             key = filename  # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
             root = filename[7:12].lower()
-            year_str = unicode( now.year )
-            month_str = filename[18:20]  # two-digit month
-            day_str = filename[21:23]  # two-digit day
-            new_filename = '{rt}_{y}-{m}-{d}.txt'.format( rt=root, y=year_str, m=month_str, d=day_str )
+            timestamp_str = filename[13:32]  # eg '2005-07-13T13-41-39'
+            new_filename = '{rt}_{tm}.txt'.format( rt=root, tm=timestamp_str )
             built_dct[key] = new_filename
         log.debug( 'built_dct, ```{0}```'.format( pprint.pformat(built_dct) ) )
         return built_dct
+
+
+    # def prepareFinalDestinationDictionary(self, archive_original_to_archive_parsed_dictionary, destination_directory):
+    #     """ Takes  most recently used dictionary (with references to empty files removed)
+    #             and creates the new dictionary for copying the parsed files to their final destination.
+    #         Also checks for pre-existing files, and if found, appends a suffix to the file name to prevent overwriting.
+    #         Called by Controller.py """
+    #     ( built_dct, now ) = ( {}, datetime.datetime.now() )
+    #     for filename in archive_original_to_archive_parsed_dictionary.values():
+    #         key = filename  # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
+    #         root = filename[7:12].lower()
+    #         year_str = unicode( now.year )
+    #         month_str = filename[18:20]  # two-digit month
+    #         day_str = filename[21:23]  # two-digit day
+    #         timestamp_str = now.isoformat()  # '2017-06-20T15:42:25.620991'
+    #         time_str_detail = timestamp_str.split( 'T' )[1]  # '15:42:25.620991'
+    #         time_str = time_str_detail.split( '.' )[0]  # '15:42:25'
+    #         new_filename = '{rt}_{y}-{m}-{d}T{tm}.txt'.format( rt=root, y=year_str, m=month_str, d=day_str, tm=time_str )
+    #         built_dct[key] = new_filename
+    #     log.debug( 'built_dct, ```{0}```'.format( pprint.pformat(built_dct) ) )
+    #     return built_dct
 
 
 
