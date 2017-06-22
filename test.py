@@ -135,8 +135,8 @@ class NameConverter_Test(unittest.TestCase):
     #     original_to_parsed_dct = {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'}
     #     destination_dir = settings.DESTINATION_DIR
     #     self.assertEquals( {
-    #         'PARSED_QHACS_2005-07-13T13-41-39.dat': 'qhacs_2017-07-13.txt',
-    #         'PARSED_QHREF_2005-07-13T13-41-39.dat': 'qhref_2017-07-13.txt' },
+    #         'PARSED_QHACS_2005-07-13T13-41-39.dat': 'qhacs_2005-07-13T13-41-39.txt',
+    #         'PARSED_QHREF_2005-07-13T13-41-39.dat': 'qhref_2005-07-13T13-41-39.txt' },
     #         self.nmcnvrtr.prepareFinalDestinationDictionary(original_to_parsed_dct, destination_dir) )
 
     def test_prepareFinalDestinationDictionary(self):
@@ -144,10 +144,9 @@ class NameConverter_Test(unittest.TestCase):
         original_to_parsed_dct = {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'}
         destination_dir = settings.DESTINATION_DIR
         self.assertEquals( {
-            'PARSED_QHACS_2005-07-13T13-41-39.dat': 'qhacs_2005-07-13T13-41-39.txt',
-            'PARSED_QHREF_2005-07-13T13-41-39.dat': 'qhref_2005-07-13T13-41-39.txt' },
+            'PARSED_QHACS_2005-07-13T13-41-39.dat': 'qhacs20050713T134139.txt',
+            'PARSED_QHREF_2005-07-13T13-41-39.dat': 'qhref20050713T134139.txt' },
             self.nmcnvrtr.prepareFinalDestinationDictionary(original_to_parsed_dct, destination_dir) )
-
 
     # end class NameConverter_Test
 

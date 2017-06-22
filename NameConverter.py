@@ -82,11 +82,33 @@ class NameConverter( object ):
         for filename in archive_original_to_archive_parsed_dictionary.values():
             key = filename  # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
             root = filename[7:12].lower()
-            timestamp_str = filename[13:32]  # eg '2005-07-13T13-41-39'
-            new_filename = '{rt}_{tm}.txt'.format( rt=root, tm=timestamp_str )
+            year_str = filename[13:17]
+            month_str = filename[18:20]
+            day_str = filename[21:23]
+            hour_str = filename[24:26]
+            minute_str = filename[27:29]
+            second_str = filename[30:32]
+            new_filename = '{rt}{yr}{mo}{dy}T{hr}{mn}{sc}.txt'.format(
+                rt=root, yr=year_str, mo=month_str, dy=day_str, hr=hour_str, mn=minute_str, sc=second_str )
             built_dct[key] = new_filename
         log.debug( 'built_dct, ```{0}```'.format( pprint.pformat(built_dct) ) )
         return built_dct
+
+
+    # def prepareFinalDestinationDictionary(self, archive_original_to_archive_parsed_dictionary, destination_directory):
+    #     """ Takes  most recently used dictionary (with references to empty files removed)
+    #             and creates the new dictionary for copying the parsed files to their final destination.
+    #         Also checks for pre-existing files, and if found, appends a suffix to the file name to prevent overwriting.
+    #         Called by Controller.py """
+    #     built_dct = {}
+    #     for filename in archive_original_to_archive_parsed_dictionary.values():
+    #         key = filename  # destinationFileName in inputDictionary becomes sourceFileName in outputDictionary
+    #         root = filename[7:12].lower()
+    #         timestamp_str = filename[13:32]  # eg '2005-07-13T13-41-39'
+    #         new_filename = '{rt}_{tm}.txt'.format( rt=root, tm=timestamp_str )
+    #         built_dct[key] = new_filename
+    #     log.debug( 'built_dct, ```{0}```'.format( pprint.pformat(built_dct) ) )
+    #     return built_dct
 
 
     # def prepareFinalDestinationDictionary(self, archive_original_to_archive_parsed_dictionary, destination_directory):
