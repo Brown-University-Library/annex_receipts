@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 
 import datetime, logging, os, pprint, sys, time, unittest
+
 parent_working_dir = os.path.abspath( os.path.join(os.getcwd(), os.pardir) )
 sys.path.append( parent_working_dir )
 from annex_eod_project import settings
