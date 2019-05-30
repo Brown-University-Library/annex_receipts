@@ -108,8 +108,10 @@ class NameConverter_Test(unittest.TestCase):
 
     def test_makeTrueOrigToArchiveOrigDictionary(self):
         """ Tests adding timestamp and prefix to original filename. """
-        formatted_time = unicode( time.strftime(
-            '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
+        # formatted_time = unicode( time.strftime(
+        #     '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
+        formatted_time = time.strftime(
+            '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1))  # u'Wed Jul 13 13:41:39 EDT 2005'
         file_list = [ 'QHACS_1110.txt', 'QHREF_1110.txt' ]
         self.assertEquals(
             {u'QHACS_1110.txt': u'ORIG_QHACS_2005-07-13T13-41-39.dat', u'QHREF_1110.txt': u'ORIG_QHREF_2005-07-13T13-41-39.dat'},
