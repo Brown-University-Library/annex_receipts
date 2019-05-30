@@ -49,8 +49,9 @@ class Emailer( object ):
             #     raise smtplib.SMTPException, errstr
         except:
             session.quit()
-            print "\n"
-            print "Attempt to send email failed with following errors: " + str(smtpresult)
+            print( '\n' )
+            # print "Attempt to send email failed with following errors: " + str(smtpresult)
+            print( f'Attempt to send email failed with following errors: ```{str(smtpresult)}```' )
             returnValue = smtpresult
         else:
             session.quit()
