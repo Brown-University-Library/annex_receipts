@@ -62,8 +62,8 @@ class FileHandler( object ):
 
         for prefix in prefixList:
             for fileName in fileList:
-                positionOfPrefix = string.find( fileName, prefix )   # haystack, needle. Will be -1 if not found
-                positionOfCountIndicator = string.find(fileName, ".cnt")
+                positionOfPrefix = str.find( fileName, prefix )   # haystack, needle. Will be -1 if not found
+                positionOfCountIndicator = str.find(fileName, ".cnt")
 #               if ( (1 == 1) & (2==2) ):
 #                   print "do something"
                 if ( (positionOfPrefix != -1) & (positionOfCountIndicator == -1) ): # if (prefixes exist AND '.cnt' substring doesn't)
