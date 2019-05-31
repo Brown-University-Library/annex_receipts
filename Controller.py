@@ -177,6 +177,7 @@ Cron job starting at `%s`.
             log.info( message )
 
         archiveOriginalToArchiveParsedDictionary = parserInstance.nonEmptiesDictionary
+        log.debug( f'archiveOriginalToArchiveParsedDictionary, ```{archiveOriginalToArchiveParsedDictionary}```' )
 
         #######
         ## copy parsed files to destination
