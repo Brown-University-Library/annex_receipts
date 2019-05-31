@@ -39,7 +39,7 @@ class DatePrepper_Test(unittest.TestCase):
         """ Tests returned date. """
         self.dt_prppr.timeToFormat = (2005, 7, 13, 13, 41, 39, 2, 194, 1) # 'Wed Jul 13 13:41:39 EDT 2005'
         self.assertEqual(
-            unicode, type(self.dt_prppr.prepareTimeStamp())
+            str, type(self.dt_prppr.prepareTimeStamp())
             )
         self.assertEqual(
             '2005-07-13T13-41-39', self.dt_prppr.prepareTimeStamp()
@@ -57,7 +57,7 @@ class Emailer_Test(unittest.TestCase):
     def test__update_full_message(self):
         """ Tests full message. """
         result = self.emlr.update_full_message( 'hello world' )
-        self.assertEqual( unicode, type(result) )
+        self.assertEqual( str, type(result) )
         lines = result.split( '\n' )
         # log.debug( 'lines, ```{}```'.format(pprint.pformat(lines)) )
         log.debug( 'lines, ```%s```' % pprint.pformat(lines) )
@@ -119,8 +119,8 @@ class NameConverter_Test(unittest.TestCase):
 
     def test_makeArchiveOrigToArchiveParsedDictionary(self):
         """ Tests creation of original-to-parsed filename dictionary. """
-        formatted_time = unicode( time.strftime(
-            '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
+        formatted_time = time.strftime(
+            '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1))  # u'Wed Jul 13 13:41:39 EDT 2005'
         input_dct = {u'QHACS_1110.txt': u'ORIG_QHACS_2005-07-13T13-41-39.dat', u'QHREF_1110.txt': u'ORIG_QHREF_2005-07-13T13-41-39.dat'}
         self.assertEqual(
             {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'},

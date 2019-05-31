@@ -24,4 +24,4 @@ class DatePrepper(object):
         else:
             theTime = self.timeToFormat
         formattedTime = time.strftime("%Y-%m-%dT%H-%M-%S", theTime)
-        return unicode( formattedTime )
+        return formattedTime
