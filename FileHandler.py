@@ -7,7 +7,8 @@ Part of LAS-to-Josiah code.
 Scan for existence of files.
 """
 
-import logging, os, pprint, shutil, string, time
+# import logging, os, pprint, shutil, string, time
+import logging, os, pprint, shutil, time
 
 
 log = logging.getLogger(__name__)

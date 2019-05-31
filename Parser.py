@@ -7,7 +7,8 @@ Part of LAS-to-Josiah code.
 Scan for existence of files.
 """
 
-import logging, os, string
+# import logging, os, string
+import logging, os
 from annex_eod_project import FileHandler, NameConverter
 
 
@@ -41,7 +42,8 @@ class Parser(object):
         self.currentFileCount = "count-" + str(recordCount)
 
         if(recordCount > 0):
-            destinationText = string.join(fileList, '')
+            # destinationText = string.join(fileList, '')
+            destinationText = ''.join(fileList)
             destinationFileReference = open(fullOutputFileName, 'w')
             destinationFileReference.write(destinationText)
             destinationFileReference.close()
@@ -138,7 +140,8 @@ class Parser(object):
 
         # sort and save filesProcessedList
         filesProcessedList.sort()
-        stringFromList = string.join(filesProcessedList, "\n")
+        # stringFromList = string.join(filesProcessedList, "\n")
+        stringFromList = '\n'.join( filesProcessedList )
         filesProcessedString = "\n" + stringFromList
         self.statusMessage = filesProcessedString
 
