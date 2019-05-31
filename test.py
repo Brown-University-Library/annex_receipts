@@ -38,10 +38,10 @@ class DatePrepper_Test(unittest.TestCase):
     def test__prepareTimeStamp(self):
         """ Tests returned date. """
         self.dt_prppr.timeToFormat = (2005, 7, 13, 13, 41, 39, 2, 194, 1) # 'Wed Jul 13 13:41:39 EDT 2005'
-        self.assertEquals(
+        self.assertEqual(
             unicode, type(self.dt_prppr.prepareTimeStamp())
             )
-        self.assertEquals(
+        self.assertEqual(
             '2005-07-13T13-41-39', self.dt_prppr.prepareTimeStamp()
             )
 
@@ -57,18 +57,18 @@ class Emailer_Test(unittest.TestCase):
     def test__update_full_message(self):
         """ Tests full message. """
         result = self.emlr.update_full_message( 'hello world' )
-        self.assertEquals( unicode, type(result) )
+        self.assertEqual( unicode, type(result) )
         lines = result.split( '\n' )
         # log.debug( 'lines, ```{}```'.format(pprint.pformat(lines)) )
         log.debug( 'lines, ```%s```' % pprint.pformat(lines) )
-        self.assertEquals( True, 'To:' in lines[0] )
-        self.assertEquals( True, settings.MAIL_HEADERTO in lines[0] )
-        self.assertEquals( True, 'Cc:' in lines[1] )
-        self.assertEquals( True, settings.MAIL_HEADERCC in lines[1] )
-        self.assertEquals( True, 'From:' in lines[2] )
-        self.assertEquals( True, settings.MAIL_HEADERFROM in lines[2] )
-        self.assertEquals( settings.MAIL_SUBJECT, lines[3] )
-        self.assertEquals( 'hello world', lines[4] )
+        self.assertEqual( True, 'To:' in lines[0] )
+        self.assertEqual( True, settings.MAIL_HEADERTO in lines[0] )
+        self.assertEqual( True, 'Cc:' in lines[1] )
+        self.assertEqual( True, settings.MAIL_HEADERCC in lines[1] )
+        self.assertEqual( True, 'From:' in lines[2] )
+        self.assertEqual( True, settings.MAIL_HEADERFROM in lines[2] )
+        self.assertEqual( settings.MAIL_SUBJECT, lines[3] )
+        self.assertEqual( 'hello world', lines[4] )
 
     # end class Emailer_Test
 
@@ -85,15 +85,15 @@ class FileHandler_Test(unittest.TestCase):
         # log.debug( 'cwd, ```{}```'.format(cwd) )
         log.debug( 'cwd, ```%s```' % cwd )
         result = self.flhndlr.scanDirectory( cwd )
-        self.assertEquals( list, type(result) )
-        self.assertEquals( True, '.DS_Store' not in result )  # cleaned file
-        self.assertEquals( True, '.git' not in result )  # directories removed
+        self.assertEqual( list, type(result) )
+        self.assertEqual( True, '.DS_Store' not in result )  # cleaned file
+        self.assertEqual( True, '.git' not in result )  # directories removed
 
     def test__makeGoodList(self):
         """ Tests filter for valid data-file from file-list. """
         prefix_list = settings.PREFIX_LIST  # Our list of prefix codes indicate whether the end-of-day reports are for re-accessions or returns, and whether they're for general, or restricted circulation items.
         file_list = [ 'a.txt', 'a.cnt', 'b.txt', 'b.cnt', 'QSREF.txt', 'QSREF.cnt' ]
-        self.assertEquals(
+        self.assertEqual(
             ['QSREF.txt'], self.flhndlr.makeGoodList( prefix_list, file_list )
             )
 
@@ -113,7 +113,7 @@ class NameConverter_Test(unittest.TestCase):
         formatted_time = time.strftime(
             '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1))  # u'Wed Jul 13 13:41:39 EDT 2005'
         file_list = [ 'QHACS_1110.txt', 'QHREF_1110.txt' ]
-        self.assertEquals(
+        self.assertEqual(
             {u'QHACS_1110.txt': u'ORIG_QHACS_2005-07-13T13-41-39.dat', u'QHREF_1110.txt': u'ORIG_QHREF_2005-07-13T13-41-39.dat'},
             self.nmcnvrtr.makeTrueOrigToArchiveOrigDictionary(file_list, formatted_time) )
 
@@ -122,21 +122,21 @@ class NameConverter_Test(unittest.TestCase):
         formatted_time = unicode( time.strftime(
             '%Y-%m-%dT%H-%M-%S', (2005, 7, 13, 13, 41, 39, 2, 194, 1)) )  # u'Wed Jul 13 13:41:39 EDT 2005'
         input_dct = {u'QHACS_1110.txt': u'ORIG_QHACS_2005-07-13T13-41-39.dat', u'QHREF_1110.txt': u'ORIG_QHREF_2005-07-13T13-41-39.dat'}
-        self.assertEquals(
+        self.assertEqual(
             {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'},
             self.nmcnvrtr.makeArchiveOrigToArchiveParsedDictionary(input_dct, formatted_time) )
 
     def test_convertInputToOriginal(self):
         """ Tests de-conversion of extended filename back into original filename. """
         filename = 'PARSED_QHREF_2005-07-13T13-41-39.dat'
-        self.assertEquals(
+        self.assertEqual(
             'QHREF_0713.txt', self.nmcnvrtr.convertInputToOriginal(filename) )
 
     def test_prepareFinalDestinationDictionary(self):
         """ Tests de-conversion of extended filename back into original filename. """
         original_to_parsed_dct = {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'}
         destination_dir = settings.DESTINATION_DIR
-        self.assertEquals( {
+        self.assertEqual( {
             'PARSED_QHACS_2005-07-13T13-41-39.dat': 'qhacs20050713T1341',
             'PARSED_QHREF_2005-07-13T13-41-39.dat': 'qhref20050713T1341' },
             self.nmcnvrtr.prepareFinalDestinationDictionary(original_to_parsed_dct, destination_dir) )
@@ -145,7 +145,7 @@ class NameConverter_Test(unittest.TestCase):
     #     """ Tests de-conversion of extended filename back into original filename. """
     #     original_to_parsed_dct = {u'ORIG_QHREF_2005-07-13T13-41-39.dat': u'PARSED_QHREF_2005-07-13T13-41-39.dat', u'ORIG_QHACS_2005-07-13T13-41-39.dat': u'PARSED_QHACS_2005-07-13T13-41-39.dat'}
     #     destination_dir = settings.DESTINATION_DIR
-    #     self.assertEquals( {
+    #     self.assertEqual( {
     #         'PARSED_QHACS_2005-07-13T13-41-39.dat': 'qhacs20050713T134139.txt',
     #         'PARSED_QHREF_2005-07-13T13-41-39.dat': 'qhref20050713T134139.txt' },
     #         self.nmcnvrtr.prepareFinalDestinationDictionary(original_to_parsed_dct, destination_dir) )
