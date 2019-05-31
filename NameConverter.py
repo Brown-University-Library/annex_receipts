@@ -26,7 +26,8 @@ class NameConverter( object ):
         for fileName in inputList:
             key = fileName
             # import string
-            underscorePosition = string.find(fileName, "_")
+            # underscorePosition = string.find(fileName, "_")
+            underscorePosition = str.find(fileName, "_")
             rootSlice = fileName[:underscorePosition]
             value = "ORIG_" + rootSlice + "_" + timeStamp + ".dat"
             builtDict[key] = value
