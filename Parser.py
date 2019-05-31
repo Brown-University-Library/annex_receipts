@@ -23,8 +23,13 @@ class Parser(object):
         self.statusMessage = "init"
         self.currentFileCount = "init"
         self.nonEmptiesDictionary = {}
-
-
+        self.count_dct = {
+            'date': str( datetime.date.today() ),
+            'hay_accessions': 0,
+            'hay_refiles': 0,
+            'non_hay_accessions': 0,
+            'non_hay_refiles': 0
+        }
 
     def parseSingleFile(self, fullSourceFileName, fullOutputFileName):
 
@@ -40,6 +45,8 @@ class Parser(object):
             recordCount = recordCount + 1
 
         self.currentFileCount = "count-" + str(recordCount)
+
+        self.build_count_dct( fullSourceFileName, recordCount )
 
         if(recordCount > 0):
             # destinationText = string.join(fileList, '')
@@ -61,7 +68,22 @@ class Parser(object):
 
         return returnValue
 
+        ## end parseSingleFile()
 
+    def build_count_dct( self, source_filename: str, record_count: int ) -> None:
+        """ Updates self.count_dct for post to annex_counts webapp.
+            Called by parseSingleFile() """
+        if 'qhacs' in source_filename.lower():
+            self.count_dct['hay_accessions'] = record_count
+        elif 'qhref' in source_filename.lower():
+            self.count_dct['hay_refiles'] = record_count
+        elif 'qsacs' in source_filename.lower():
+            self.count_dct['non_hay_accessions'] = record_count
+        elif 'qsref' in source_filename.lower():
+            self.count_dct['non_hay_refiles'] = record_count
+        else:
+            log.warning( f"what's up with source_filename ```{source_filename}```?" )
+        return
 
 #   def parseFileDictionary(self, sourceDirectory, destinationDirectory, nameDictionary):
 #
@@ -137,6 +159,7 @@ class Parser(object):
             nameConverterInstance = NameConverter.NameConverter()
             fileName = nameConverterInstance.convertInputToOriginal(sourceFileName)
             filesProcessedList.append("'" + fileName + "', " + self.currentFileCount)
+        log.debug( f'builtDict, ```{pprint.pformat(builtDict)}```' )
 
         # sort and save filesProcessedList
         filesProcessedList.sort()
@@ -151,10 +174,26 @@ class Parser(object):
         if(returnValue == "init"):
             returnValue = "success"
 
+        ## post counts to annex_counts webapp
+        self.post_counts()
+
         return returnValue
 
+        ## end def parseFileDictionary()
 
+    def post_counts( self ) -> None:
+        """ Posts dct to annex_counts webapp.
+            Called by parseFileDictionary() """
+        ( self.count_dct['auth_key'], seconds ) = ( settings.ANNEX_COUNTS_API_AUTHKEY, 5 )  # setup
+        try:
+            r = requests.post( url, params=self.count_dct, timeout=10 )
+        except Exception as e:
+            log.warning( f'exception on annex-counts post, ```{str(e)}```; will try again in `{seconds}` seconds' )
+            time.sleep( seconds )
+            try:
+                r = requests.post( url, params=self.count_dct, timeout=10 )
+            except Exception as e:
+                log.error( f'exception on annex-counts post, ```{str(e)}```' )
+        return
 
-
-
-# bottom
+    ## end class Parser
