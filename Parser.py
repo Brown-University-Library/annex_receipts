@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 """
 Part of LAS-to-Josiah code.
 Scan for existence of files.
 """
 
-# import logging, os, string
-import logging, os
+import datetime, logging, os, pprint, time
+
+import requests
+from . import settings
 from annex_eod_project import FileHandler, NameConverter
 
 
