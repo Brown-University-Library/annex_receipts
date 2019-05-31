@@ -168,8 +168,16 @@ class FileHandler( object ):
             else:
                 filesCopiedList.append("'" + fullFilePath + "'")
 
+        # filesCopiedList.sort()
+        # stringFromList = string.join(filesCopiedList, '\n')
+        # filesCopiedString = "\n" + stringFromList
+        # self.statusMessage = filesCopiedString
+
         filesCopiedList.sort()
-        stringFromList = string.join(filesCopiedList, '\n')
+        log.debug( f'filesCopiedList, ```{pprint.pformat(filesCopiedList)}```' )
+        # stringFromList = string.join(filesCopiedList, '\n')
+        stringFromList = '\n'.join( filesCopiedList )
+        log.debug( f'stringFromList, ```{stringFromList}```' )
         filesCopiedString = "\n" + stringFromList
         self.statusMessage = filesCopiedString
 
