@@ -184,6 +184,7 @@ class Parser(object):
     def post_counts( self ) -> None:
         """ Posts dct to annex_counts webapp.
             Called by parseFileDictionary() """
+        log.debug( f'self.count_dct, ```{pprint.pformat(self.count_dct)}```' )
         self.count_dct['auth_key'] = settings.ANNEX_COUNTS_API_AUTHKEY
         seconds = 5
         try:
@@ -195,6 +196,7 @@ class Parser(object):
                 r = requests.post( settings.ANNEX_COUNTS_API_UPDATER_URL, params=self.count_dct, timeout=10 )
             except Exception as e:
                 log.error( f'exception on annex-counts post, ```{str(e)}```' )
+        log.debug( 'well that seemed to go well' )
         return
 
     ## end class Parser
