@@ -188,7 +188,9 @@ class Parser(object):
         self.count_dct['auth_key'] = settings.ANNEX_COUNTS_API_AUTHKEY
         seconds = 5
         try:
-            r = requests.post( settings.ANNEX_COUNTS_API_UPDATER_URL, params=self.count_dct, timeout=10 )
+            r = requests.post( settings.ANNEX_COUNTS_API_UPDATER_URL, data=self.count_dct, timeout=10 )
+            log.debug( f'r.status_code, `{r.status_code}`' )
+            log.debug( f'r.content, ```{r.content.decode("utf-8")}```')
         except Exception as e:
             log.warning( f'exception on annex-counts post, ```{str(e)}```; will try again in `{seconds}` seconds' )
             time.sleep( seconds )
@@ -196,7 +198,7 @@ class Parser(object):
                 r = requests.post( settings.ANNEX_COUNTS_API_UPDATER_URL, params=self.count_dct, timeout=10 )
             except Exception as e:
                 log.error( f'exception on annex-counts post, ```{str(e)}```' )
-        log.debug( 'well that seemed to go well' )
+        # log.debug( 'well that seemed to go well' )
         return
 
     ## end class Parser
