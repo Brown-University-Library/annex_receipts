@@ -235,8 +235,10 @@ class FileHandler( object ):
         for fileName in initialList:
 
             for prefix in prefixList:
-                positionOfPrefix = string.find( fileName, prefix )   # haystack, needle. Will be -1 if not found
-                positionOfCountIndicator = string.find(fileName, ".cnt")
+                # positionOfPrefix = string.find( fileName, prefix )   # haystack, needle. Will be -1 if not found
+                # positionOfCountIndicator = string.find(fileName, ".cnt")
+                positionOfPrefix = str.find( fileName, prefix )   # haystack, needle. Will be -1 if not found
+                positionOfCountIndicator = str.find(fileName, ".cnt")
                 if ( (positionOfPrefix != -1) & (positionOfCountIndicator != -1) ): # if (prefix exists AND '.cnt' substring exists)
                     newList.append(fileName)
                     break
