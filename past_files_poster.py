@@ -84,10 +84,10 @@ class Counter:
         self.initialize_count_tracker()
         self.make_date_dict( file_entries )
         for entry in file_entries:
-            date = self.parse_date( entry )
-            count_type = self.parse_type( entry )
-            count = self.parse_count( entry )
-            self.update_count_tracker( entry )
+            entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
+            count_type: str = self.parse_type( entry['path'] )
+            count: int = self.parse_count( entry )
+            self.update_count_tracker( entry_date, count_type, count )
         return
 
     def load_file_list( self ) -> List[dict]:
@@ -118,6 +118,22 @@ class Counter:
         log.debug( f'self.date_dct, ```{pprint.pformat(self.date_dct)[0:100]}```' )
         log.debug( f'num-dates, `{len(self.date_dct.keys())}`' )
         return
+
+    def parse_type( self, path: str ) -> str:
+        """ Parses count type.
+            Called by build_count_tracker() """
+        count_type: str = ''
+        if 'QHACS' in path:
+            count_type = 'hay_accessions'
+        elif 'QSACS' in path:
+            count_type = 'non-hay_accessions'
+        elif 'QHREF' in path:
+            count_type = 'hay_refiles'
+        elif 'QSREF' in path:
+            count_type = 'non-yay_refiles'
+        else:
+            raise Exception( 'unhandled count-type' )
+        return count_type
 
     ## end class Counter
 
