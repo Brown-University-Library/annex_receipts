@@ -86,7 +86,7 @@ class Counter:
         for entry in file_entries:
             entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
             count_type: str = self.parse_type( entry['path'] )
-            count: int = self.parse_count( entry )
+            count: int = self.parse_count( entry['path'] )
             self.update_count_tracker( entry_date, count_type, count )
         return
 
@@ -134,6 +134,14 @@ class Counter:
         else:
             raise Exception( 'unhandled count-type' )
         return count_type
+
+    def parse_count( self, path: str ) -> int:
+        """ Loads file and parses count.
+            Called by build_count_tracker() """
+        with open( path, 'r' ) as f:
+            data = f.readlines()
+        count = len( data )
+        return count
 
     ## end class Counter
 
