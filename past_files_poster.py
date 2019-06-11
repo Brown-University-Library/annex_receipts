@@ -248,3 +248,33 @@ class Initializer:
 if __name__ == '__main__':
     initializer = Initializer()
     initializer.initialize_tracker()
+
+
+
+
+# def parse_args():
+#     """ Parses arguments when module called via __main__ """
+#     parser = argparse.ArgumentParser( description='Required: function-name.' )
+#     parser.add_argument( '--function', '-f', help='function name required', required=True )
+#     args_dict = vars( parser.parse_args() )
+#     return args_dict
+
+
+# def call_function( function_name: str ) -> None:
+#     """ Safely calls function named via input string to __main__
+#         Credit: <https://stackoverflow.com/a/51456172> """
+#     log.debug( f'function_name, ```{function_name}```' )
+#     checker = OpenTextbookChecker()
+#     safe_dispatcher = { 'build_keys': build_keys, 'check_opentextbook': checker.check_opentextbook }
+#     try:
+#         safe_dispatcher[function_name]()
+#     except:
+#         raise Exception( 'invalid function' )
+#     return
+
+
+# if __name__ == '__main__':
+#     args: dict = parse_args()
+#     log.debug( f'args, ```{args}```' )
+#     submitted_function: str = args['function']
+#     call_function( submitted_function )
