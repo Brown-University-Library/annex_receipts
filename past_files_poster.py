@@ -65,8 +65,7 @@ class Counter:
         self.INITIAL_TRACKER_PATH = os.environ['ANXEOD__TRACKER_A_PATH']
         self.COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_B_PATH']
         self.date_dct = {}
-        pass
-
+        self.start = datetime.datetime.now()
 
     def build_count_tracker( self ) -> None:
         """
@@ -87,7 +86,8 @@ class Counter:
             entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
             count_type: str = self.parse_type( entry['path'] )
             count: int = self.parse_count( entry['path'] )
-            self.update_count_tracker( entry_date, count_type, count )
+            self.date_dct[entry_date][count_type] = count
+        self.update_count_tracker()
         return
 
     def load_file_list( self ) -> List[dict]:
@@ -142,6 +142,15 @@ class Counter:
             data = f.readlines()
         count = len( data )
         return count
+
+    def update_count_tracker( self ) -> None:
+        """ Writes file.
+            Called by build_count_tracker() """
+        jsn: str = json.dumps( self.date_dct, sort_keys=True, indent=2 )
+        with open( self.COUNT_TRACKER_PATH, 'w' ) as f.
+            f.write( jsn )
+        log.debug( f'time-taken, `{str( datetime.datetime.now() - self.start )}`' )
+        return
 
     ## end class Counter
 
