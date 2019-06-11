@@ -155,61 +155,16 @@ class Counter:
     ## end class Counter
 
 
-## setup
+class Updater:
+    """ Updates db. """
 
-# SOURCE_DIR_PATH = os.environ['ANXEOD__SOURCE_DIR_PATH']
+    def __init__( self ):
+        pass
 
-# filepath_tracker = []
-# date_count_tracker = []
+    def update_db( self ):
+        pass
 
-# logging.basicConfig(
-#     # filename=settings.LOG_PATH,
-#     level=logging.DEBUG,
-#     format='[%(asctime)s] %(levelname)s [%(module)s-%(funcName)s()::%(lineno)d] %(message)s',
-#     datefmt='%d/%b/%Y %H:%M:%S' )
-# log = logging.getLogger(__name__)
-
-
-# ## get list of files
-
-# files: list = glob.glob( f'{SOURCE_DIR_PATH}/*.dat' )
-# # log.debug( f'files, ```{pprint.pformat(files)}```' )
-# log.debug( f'len(files), `{len(files)}`' )
-
-
-# ## populate filepath_tracker
-
-# start = datetime.datetime.now()
-# for path in files:
-#     # log.debug( f'path, `{path}`' )
-
-#     file_timestamp: float = os.path.getmtime( path )
-#     # log.debug( f'file_timestamp, `{file_timestamp}`; type, `{type(file_timestamp)}`' )
-
-#     timestamp: datetime.datetime = datetime.datetime.fromtimestamp(file_timestamp)
-#     # log.debug( f'timestamp, `{timestamp}`; type(timestamp), `{type(timestamp)}`' )
-
-#     info: dict = { 'path': path, 'timestamp': timestamp, 'updated': None }
-#     filepath_tracker.append( info )
-
-# sorted_filepath_tracker: list = sorted( filepath_tracker, key=itemgetter('timestamp') )
-# # log.debug( f'sorted_filepath_tracker, ```{pprint.pformat(sorted_filepath_tracker)}```' )
-# log.debug( f'len(sorted_filepath_tracker), `{len(sorted_filepath_tracker)}`' )
-
-# time_taken = str( datetime.datetime.now() - start )
-# log.debug( f'time_taken, `{time_taken}`' )
-
-
-## for each file...
-
-# record: dict
-# for record in files:
-
-    ## get count
-
-    ## post
-
-    ## update tracker
+    ## end class Updater
 
 
 
@@ -340,9 +295,11 @@ def call_function( function_name: str ) -> None:
     log.debug( f'function_name, ```{function_name}```' )
     initializer = Initializer()
     counter = Counter()
+    updater = Updater()
     safe_dispatcher = {
         'initialize_tracker': initializer.initialize_tracker,
-        'build_counts': counter.build_count_tracker
+        'build_counts': counter.build_count_tracker,
+        'update_db': updater.update_db
         }
     try:
         safe_dispatcher[function_name]()
