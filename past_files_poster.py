@@ -116,6 +116,7 @@ class Counter:
             date_str: str = str( date_obj )
             self.date_dct[date_str] = {}
         log.debug( f'self.date_dct, ```{pprint.pformat(self.date_dct)[0:100]}```' )
+        log.debug( f'num-dates, `{len(self.date_dct.keys())}`' )
         return
 
     ## end class Counter
