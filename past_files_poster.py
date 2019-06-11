@@ -22,26 +22,6 @@ class Initializer:
         self.start = datetime.datetime.now()
         self.files: list = glob.glob( f'{self.SOURCE_DIR_PATH}/*.dat' )
 
-    # def initialize_tracker( self ):
-    #     """ Manages build.
-    #         Called by main() """
-    #     log.debug( f'len(files), `{len(self.files)}`' )
-    #     for path in self.files:
-    #         file_timestamp: float = os.path.getmtime( path )
-    #         timestamp: datetime.datetime = datetime.datetime.fromtimestamp( file_timestamp )
-    #         info: dict = { 'path': path, 'timestamp': timestamp, 'updated': None }
-    #         self.filepath_tracker.append( info )
-    #     sorted_filepath_tracker: list = sorted( self.filepath_tracker, key=itemgetter('timestamp') )
-    #     for entry in sorted_filepath_tracker:
-    #         entry['timestamp'] = str( entry['timestamp'] )
-    #     log.debug( f'len(sorted_filepath_tracker), `{len(sorted_filepath_tracker)}`' )
-    #     time_taken = str( datetime.datetime.now() - self.start )
-    #     log.debug( f'time_taken, `{time_taken}`' )
-    #     with open( self.DESTINATION_PATH, 'w' ) as f:
-    #         jsn: str = json.dumps( sorted_filepath_tracker, sort_keys=True, indent=2 )
-    #         f.write( jsn )
-    #     return
-
     def initialize_tracker( self ):
         """ Manages build.
             Called by main() """
@@ -76,6 +56,18 @@ class Initializer:
 
     ## end class Initializer
 
+
+class Counter:
+    """ Creates count-tracker. """
+
+    def __init__( self ):
+        pass
+
+
+    def build_count_tracker( self ):
+        pass
+
+    ## end class Counter
 
 
 ## setup
@@ -262,7 +254,11 @@ def call_function( function_name: str ) -> None:
         Credit: <https://stackoverflow.com/a/51456172> """
     log.debug( f'function_name, ```{function_name}```' )
     initializer = Initializer()
-    safe_dispatcher = { 'initialize_tracker': initializer.initialize_tracker }
+    counter = Counter()
+    safe_dispatcher = {
+        'initialize_tracker': initializer.initialize_tracker,
+        'build_counts': counter.build_count_tracker
+        }
     try:
         safe_dispatcher[function_name]()
     except:
