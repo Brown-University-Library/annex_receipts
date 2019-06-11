@@ -86,7 +86,7 @@ class Counter:
             entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
             count_type: str = self.parse_type( entry['path'] )
             count: int = self.parse_count( entry['path'] )
-            self.date_dct[entry_date][count_type] = count
+            self.date_dct[str(entry_date)][count_type] = count
         self.update_count_tracker()
         return
 
@@ -130,7 +130,7 @@ class Counter:
         elif 'QHREF' in path:
             count_type = 'hay_refiles'
         elif 'QSREF' in path:
-            count_type = 'non-yay_refiles'
+            count_type = 'non-hay_refiles'
         else:
             raise Exception( 'unhandled count-type' )
         return count_type
@@ -147,7 +147,7 @@ class Counter:
         """ Writes file.
             Called by build_count_tracker() """
         jsn: str = json.dumps( self.date_dct, sort_keys=True, indent=2 )
-        with open( self.COUNT_TRACKER_PATH, 'w' ) as f.
+        with open( self.COUNT_TRACKER_PATH, 'w' ) as f:
             f.write( jsn )
         log.debug( f'time-taken, `{str( datetime.datetime.now() - self.start )}`' )
         return
