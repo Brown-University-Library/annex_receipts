@@ -2,6 +2,7 @@
 
 import argparse, datetime, glob, json, logging, os, pprint, time
 from operator import itemgetter
+from typing import List
 
 
 logging.basicConfig(
@@ -111,10 +112,10 @@ class Counter:
             Called by build_count_tracker() """
         for entry in file_entries:
             timestamp: str = entry['timestamp']
-            date_obj: datetime.date = datetime.datetime.strptime( timestamp, '%Y-%M-%D' ).date()
+            date_obj: datetime.date = datetime.datetime.strptime( timestamp, '%Y-%m-%d %H:%M:%S' ).date()
             date_str: str = str( date_obj )
             self.date_dct[date_str] = {}
-        log.debug( f'self.date_dct, ```{self.date_dct}```' )
+        log.debug( f'self.date_dct, ```{pprint.pformat(self.date_dct)[0:100]}```' )
         return
 
     ## end class Counter
