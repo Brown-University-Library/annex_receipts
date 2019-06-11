@@ -61,11 +61,61 @@ class Counter:
     """ Creates count-tracker. """
 
     def __init__( self ):
+        self.INITIAL_TRACKER_PATH = os.environ['ANXEOD__TRACKER_A_PATH']
+        self.COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_B_PATH']
+        self.date_dct = {}
         pass
 
 
-    def build_count_tracker( self ):
-        pass
+    def build_count_tracker( self ) -> None:
+        """
+        Flow...
+        load file
+        create new count_tracker file
+        create a list of date-dicts by going through all entries
+        for each entry
+            determin the proper date
+            determine the _kind_ of count
+            determine the count
+            update the count-tracker file
+        """
+        file_entries: List[dict] = self.load_file_list()
+        self.initialize_count_tracker()
+        self.make_date_dict( file_entries )
+        for entry in file_entries:
+            date = self.parse_date( entry )
+            count_type = self.parse_type( entry )
+            count = self.parse_count( entry )
+            self.update_count_tracker( entry )
+        return
+
+    def load_file_list( self ) -> List[dict]:
+        """ Loads tracker-a.
+            Called by build_count_tracker() """
+        with open( self.INITIAL_TRACKER_PATH, 'r' ) as f:
+            entries_jsn: str = f.read()
+            entries: list = json.loads( entries_jsn )
+        return entries
+
+    def initialize_count_tracker( self ) -> None:
+        """ Saves empty list file.
+            Called by build_count_tracker() """
+        count_tracker: list = []
+        empty_count_tracker_jsn: str = json.dumps( count_tracker )
+        with open( self.COUNT_TRACKER_PATH, 'w' ) as f:
+            f.write( empty_count_tracker_jsn )
+        return
+
+    def make_date_dict( self, file_entries: List[dict] ) -> None:
+        """ Populates self.date_dct.
+            Called by build_count_tracker() """
+        for entry in file_entries:
+            timestamp: str = entry['timestamp']
+            date_obj: datetime.date = datetime.datetime.strptime( timestamp, '%Y-%M-%D' ).date()
+            date_str: str = str( date_obj )
+            self.date_dct[date_str] = {}
+        log.debug( f'self.date_dct, ```{self.date_dct}```' )
+        return
 
     ## end class Counter
 
