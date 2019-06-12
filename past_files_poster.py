@@ -171,15 +171,33 @@ class Updater:
             Called by main()
             Credit: <https://stackoverflow.com/questions/51250706/combining-semaphore-and-time-limiting-in-python-trio-with-asks-http-request>
             """
+        self.setup_final_tracker()
         with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
             count_tracker_dct = json.loads( f.read() )
         for date_key in count_tracker_dct.keys():
-            entry = count_tracker_dct[key]
+            entry = count_tracker_dct[date_key]
             entry['updated'] = None
         self.updated_count_tracker_dct = count_tracker_dct
         with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
             f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
         trio.run( partial(self.manage_concurrent_updates, urls=iter(links), n_workers=3) )
+        return
+
+    def setup_final_tracker( self ) -> None:
+        """ Initializes final tracker if it doesn't exist.
+            Called by update_db() """
+        try:
+            with open( self.UPDATED_COUNT_TRACKER_PATH, 'r' ) as f:
+                self.updated_count_tracker_dct = json.loads( f.read() )
+                log.debug( 'existing updated_count_tracker found and loaded' )
+        except Exception as e:
+            log.debug( f'updated_count_tracker _not_ found, exception was ```{e}```, so creating it' )
+            with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
+                count_tracker_dct = json.loads( f.read() )
+            for date_key in count_tracker_dct.keys():
+                entry = count_tracker_dct[date_key]
+                entry['updated'] = None
+            self.updated_count_tracker_dct = count_tracker_dct
         return
 
     async def manage_concurrent_updates(self, urls: Iterator, n_workers: int ):
