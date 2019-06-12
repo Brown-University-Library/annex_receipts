@@ -159,10 +159,71 @@ class Updater:
     """ Updates db. """
 
     def __init__( self ):
-        pass
+        self.COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_B_PATH']
+        self.UPDATED_COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_C_PATH']
+        self.updated_count_tracker_dct = {}
+        self.nursery = None
+        self.throttle: float = 1.0
+        self.mutex = None
 
-    def update_db( self ):
-        pass
+    def update_db( self ) -> None:
+        """ Calls concurrency-manager function.
+            Called by main()
+            Credit: <https://stackoverflow.com/questions/51250706/combining-semaphore-and-time-limiting-in-python-trio-with-asks-http-request>
+            """
+        with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
+            count_tracker_dct = json.loads( f.read() )
+        for date_key in count_tracker_dct.keys()
+            entry = count_tracker_dct[key]
+            entry['updated'] = None
+        self.updated_count_tracker_dct = count_tracker_dct
+        with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
+            f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
+        trio.run( partial(self.manage_concurrent_updates, urls=iter(links), n_workers=3) )
+        return
+
+    async def manage_concurrent_updates(self, urls: Iterator, n_workers: int ):
+        """ Manages asynchronous processing of db updates.
+            Called by update_db() """
+        async with trio.open_nursery() as nursery:
+            self.nursery = nursery
+            for _ in range(n_workers):
+                self.nursery.start_soon( self.run_worker_job )
+
+    async def run_worker_job( self ) -> None:
+        """ Manages worker job.
+            Called by manage_concurrent_updates() """
+        log.debug( 'function starting' )
+        await self.get_mutex().acquire()
+        log.debug( 'mutex acquired to start job' )
+        self.nursery.start_soon( self.tick )
+        entry: dict = self.grab_next_entry()
+        params: dict = self.prep_params( entry )
+        response = await asks.post( entry, data=params )
+        self.update_tracker( response )
+        return
+
+    def get_mutex( self ):
+        if self.mutex == None:
+            self.mutex = trio.Semaphore(1)
+        else:
+            pass
+        log.debug( 'returning mutex' )
+        return self.mutex
+
+    async def tick( self ) -> None:
+        await trio.sleep( self.throttle )
+        self.mutex.release()
+
+    def grab_next_entry( self ) -> dict:
+        for key in self.count_tracker_dct.keys():
+            entry = self.count_tracker_dct[key]
+            # twentyfour_hours_ago = datetime.datetime.now() + datetime.timedelta( hours=-24 )
+            # if entry['last_grabbed'] is None or datetime.datetime.strptime( entry['last_grabbed'], '%Y-%m-%dT%H:%M:%S.%f' ) < twentyfour_hours_ago:  # the second 'or' condition converts the isoformat-date back into a date-object to be able to compare
+            if entry['last_grabbed'] is None:
+                batch = entry
+                break
+
 
     ## end class Updater
 
