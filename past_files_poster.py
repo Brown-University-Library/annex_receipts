@@ -239,6 +239,7 @@ class Updater:
                 # self.update_tracker( response )
                 await self.post_update( entry )
                 log.debug( 'url processed' )
+                self.save_updated_tracker()
         return
 
     def get_mutex( self ):
@@ -282,7 +283,7 @@ class Updater:
         log.debug( f'status_code, `{resp.status_code}`' )
         log.debug( f'content, ```{resp.content.decode("utf-8")}```')
         log.debug( f'`{temp_process_id}` -- url response received, ```{resp.content}```' )
-        # response = await asks.get(url)
+        entry['updated'] = True
         return
 
     def prep_params( self, entry: dict ):
@@ -300,24 +301,13 @@ class Updater:
         log.debug( f'param_dct, ```{param_dct}```' )
         return param_dct
 
-    # def prep_params( self, entry: dict ):
-    #     """ Preps post params.
-    #         Called by post_update() """
-    #     ( date_key, info ) = list( entry.items() )[0]  # date_key: str, info: dict
-    #     log.debug( f'info, ```{info}```' )
-    #     param_dct = {
-    #         'date': date_key,
-    #         'hay_accessions': info['hay_accessions'],
-    #         'hay_refiles': info['hay_refiles'],
-    #         'non_hay_accessions': info['non-hay_accessions'],
-    #         'non_hay_refiles': info['non-hay_refiles'],
-    #     }
-    #     param_dct_copy = param_dct.copy()  # because you can't delete the dict keys as you're iterating through it
-    #     for key in param_dct.keys():
-    #         if param_dct[key] == 0:
-    #             del param_dct_copy[key]
-    #     log.debug( f'param_dct_copy, ```{param_dct_copy}```' )
-    #     return param_dct_copy
+    def save_updated_tracker( self ) -> None:
+        """ Writes dct attribute.
+            Called by run_worker_job() """
+        with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
+            f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
+        log.debug( 'updated tracker saved' )
+        return
 
     ## end class Updater
 
