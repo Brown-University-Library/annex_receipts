@@ -224,10 +224,10 @@ class Updater:
             if entry is None:
                 log.info( 'no more entries -- send cancel' )
                 self.continue_worker_flag = False
-                break
-            params: dict = self.prep_params( entry )
-            response = await asks.post( entry, data=params )
-            self.update_tracker( response )
+            else:
+                params: dict = self.prep_params( entry )
+                response = await asks.post( entry, data=params )
+                self.update_tracker( response )
         return
 
     def get_mutex( self ):
