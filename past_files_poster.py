@@ -281,7 +281,7 @@ class Updater:
         resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
         log.debug( f'status_code, `{resp.status_code}`' )
         log.debug( f'content, ```{resp.content.decode("utf-8")}```')
-        log.debug( f'`{temp_process_id}` -- url response received, ```{response.content}```' )
+        log.debug( f'`{temp_process_id}` -- url response received, ```{resp.content}```' )
         # response = await asks.get(url)
         return
 
