@@ -274,9 +274,13 @@ class Updater:
         """ Runs the post.
             Called by run_worker_job() """
         params: dict = self.prep_params( entry )
+        params['auth_key'] = self.API_AUTHKEY
         temp_process_id = random.randint( 1111, 9999 )
         log.debug( f'`{temp_process_id}` -- about to hit url' )
-        response = await asks.post( 'https://httpbin.org/delay/4' )
+        # response = await asks.post( 'https://httpbin.org/delay/4' )
+        resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
+        log.debug( f'status_code, `{resp.status_code}`' )
+        log.debug( f'content, ```{resp.content.decode("utf-8")}```')
         log.debug( f'`{temp_process_id}` -- url response received, ```{response.content}```' )
         # response = await asks.get(url)
         return
@@ -291,7 +295,7 @@ class Updater:
             'hay_accessions': info['hay_accessions'],
             'hay_refiles': info['hay_refiles'],
             'non_hay_accessions': info['non-hay_accessions'],
-            'non_hay_refiles': info['non-hay_refiles']
+            'non_hay_refiles': info['non-hay_refiles'],
         }
         param_dct_copy = param_dct.copy()  # because you can't delete the dict keys as you're iterating through it
         for key in param_dct.keys():
