@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import argparse, datetime, glob, json, logging, os, pprint, time
+import argparse, datetime, glob, json, logging, os, pprint, random, time
 from functools import partial
 from operator import itemgetter
 from typing import Iterator, List
@@ -169,6 +169,7 @@ class Updater:
         self.throttle: float = 1.0
         self.mutex = None
         self.continue_worker_flag = True
+        self.start = datetime.datetime.now()
 
     def update_db( self ) -> None:
         """ Calls concurrency-manager function.
@@ -185,6 +186,7 @@ class Updater:
         with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
             f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
         trio.run( partial(self.manage_concurrent_updates, n_workers=3) )
+        log.debug( f'total time taken, `{str( datetime.datetime.now() - self.start )}` seconds' )
         return
 
     def setup_final_tracker( self ) -> None:
@@ -216,7 +218,9 @@ class Updater:
         """ Manages worker job.
             Called by manage_concurrent_updates() """
         log.debug( 'function starting' )
-        if self.continue_worker_flag is True:
+        temp_counter = 0
+        while self.continue_worker_flag is True:
+            temp_counter += 1
             await self.get_mutex().acquire()
             log.debug( 'mutex acquired to start job' )
             self.nursery.start_soon( self.tick )
@@ -224,10 +228,15 @@ class Updater:
             if entry is None:
                 log.info( 'no more entries -- send cancel' )
                 self.continue_worker_flag = False
+            elif temp_counter == 3:
+                log.info( f'temp_counter, `{temp_counter}`, so will stop' )
+                self.continue_worker_flag = False
             else:
-                params: dict = self.prep_params( entry )
-                response = await asks.post( entry, data=params )
-                self.update_tracker( response )
+                # params: dict = self.prep_params( entry )
+                # response = await asks.post( entry, data=params )
+                # self.update_tracker( response )
+                await self.grab_url()
+                log.debug( 'url processed' )
         return
 
     def get_mutex( self ):
@@ -242,15 +251,31 @@ class Updater:
         await trio.sleep( self.throttle )
         self.mutex.release()
 
-    def grab_next_entry( self ) -> dict:
-        batch: dict
+    def grab_next_entry( self ):
+        batch = None
         for key in self.updated_count_tracker_dct.keys():
             entry = self.updated_count_tracker_dct[key]
             # twentyfour_hours_ago = datetime.datetime.now() + datetime.timedelta( hours=-24 )
             # if entry['last_grabbed'] is None or datetime.datetime.strptime( entry['last_grabbed'], '%Y-%m-%dT%H:%M:%S.%f' ) < twentyfour_hours_ago:  # the second 'or' condition converts the isoformat-date back into a date-object to be able to compare
             if entry['updated'] is None:
-                batch = entry
+                log.debug( 'found a next-batch' )
+                batch = entry.copy()
+                entry['updated'] = 'in_process'
                 break
+        log.debug( f'returning batch, ```{batch}```' )
+        log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
+        return batch
+
+    async def grab_url( self,  ):
+        # dummy_delay = 2
+        # log.debug( f'about to sleep for, `{dummy_delay}` second(s)' )
+        # time.sleep( dummy_delay )
+        temp_process_id = random.randint( 1111, 9999 )
+        log.debug( f'`{temp_process_id}` -- about to hit url' )
+        response = await asks.get( 'https://httpbin.org/delay/4' )
+        log.debug( f'`{temp_process_id}` -- url response received, ```{response.content}```' )
+        # response = await asks.get(url)
+        return
 
 
     ## end class Updater
