@@ -297,12 +297,27 @@ class Updater:
             'non_hay_accessions': info['non-hay_accessions'],
             'non_hay_refiles': info['non-hay_refiles'],
         }
-        param_dct_copy = param_dct.copy()  # because you can't delete the dict keys as you're iterating through it
-        for key in param_dct.keys():
-            if param_dct[key] == 0:
-                del param_dct_copy[key]
-        log.debug( f'param_dct_copy, ```{param_dct_copy}```' )
-        return param_dct_copy
+        log.debug( f'param_dct, ```{param_dct}```' )
+        return param_dct
+
+    # def prep_params( self, entry: dict ):
+    #     """ Preps post params.
+    #         Called by post_update() """
+    #     ( date_key, info ) = list( entry.items() )[0]  # date_key: str, info: dict
+    #     log.debug( f'info, ```{info}```' )
+    #     param_dct = {
+    #         'date': date_key,
+    #         'hay_accessions': info['hay_accessions'],
+    #         'hay_refiles': info['hay_refiles'],
+    #         'non_hay_accessions': info['non-hay_accessions'],
+    #         'non_hay_refiles': info['non-hay_refiles'],
+    #     }
+    #     param_dct_copy = param_dct.copy()  # because you can't delete the dict keys as you're iterating through it
+    #     for key in param_dct.keys():
+    #         if param_dct[key] == 0:
+    #             del param_dct_copy[key]
+    #     log.debug( f'param_dct_copy, ```{param_dct_copy}```' )
+    #     return param_dct_copy
 
     ## end class Updater
 
