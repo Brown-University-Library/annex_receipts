@@ -244,7 +244,7 @@ class Updater:
 
     def grab_next_entry( self ) -> dict:
         batch: dict
-        for key in self.count_tracker_dct.keys():
+        for key in self.updated_count_tracker_dct.keys():
             entry = self.updated_count_tracker_dct[key]
             # twentyfour_hours_ago = datetime.datetime.now() + datetime.timedelta( hours=-24 )
             # if entry['last_grabbed'] is None or datetime.datetime.strptime( entry['last_grabbed'], '%Y-%m-%dT%H:%M:%S.%f' ) < twentyfour_hours_ago:  # the second 'or' condition converts the isoformat-date back into a date-object to be able to compare
