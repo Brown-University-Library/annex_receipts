@@ -4,6 +4,8 @@ import argparse, datetime, glob, json, logging, os, pprint, time
 from operator import itemgetter
 from typing import Iterator, List
 
+import asks, trio
+
 
 logging.basicConfig(
     # filename=settings.LOG_PATH,
