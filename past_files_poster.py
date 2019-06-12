@@ -164,6 +164,8 @@ class Updater:
     def __init__( self ):
         self.COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_B_PATH']
         self.UPDATED_COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_C_PATH']
+        self.API_UPDATER_URL = os.environ['ANXEOD__ANNEX_COUNTS_API_UPDATER_URL']
+        self.API_AUTHKEY = os.environ['ANXEOD__ANNEX_COUNTS_API_AUTHKEY']
         self.updated_count_tracker_dct = {}
         self.nursery = None
         self.throttle: float = 1.0
@@ -214,34 +216,6 @@ class Updater:
             for _ in range(n_workers):
                 self.nursery.start_soon( self.run_worker_job )
 
-    # async def run_worker_job( self ) -> None:
-    #     """ Manages worker job.
-    #         Called by manage_concurrent_updates() """
-    #     log.debug( 'function starting' )
-    #     temp_counter = 0
-    #     while self.continue_worker_flag is True:
-    #         temp_counter += 1
-    #         await self.get_mutex().acquire()
-    #         log.debug( 'mutex acquired to start job' )
-    #         self.nursery.start_soon( self.tick )
-    #         entry: dict = self.grab_next_entry()
-    #         if entry and temp_counter < 3:
-    #             log.info( 'no more entries -- cancel' )
-    #             self.continue_worker_flag = False
-    #             break
-    #         elif temp_counter >= 3:  # sanity-check
-    #             log.info( f'temp_counter, `{temp_counter}`, so will stop' )
-    #             self.continue_worker_flag = False
-    #             break
-    #         else:
-    #             # params: dict = self.prep_params( entry )
-    #             # response = await asks.post( entry, data=params )
-    #             # self.update_tracker( response )
-
-    #             await self.grab_url()
-    #             log.debug( 'url processed' )
-    #     return
-
     async def run_worker_job( self ) -> None:
         """ Manages worker job.
             Called by manage_concurrent_updates() """
@@ -263,7 +237,7 @@ class Updater:
                 # params: dict = self.prep_params( entry )
                 # response = await asks.post( entry, data=params )
                 # self.update_tracker( response )
-                await self.grab_url( entry )
+                await self.post_update( entry )
                 log.debug( 'url processed' )
         return
 
@@ -296,20 +270,20 @@ class Updater:
         log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
         return batch
 
-    async def grab_url( self, entry: dict  ):
+    async def post_update( self, entry: dict  ):
         """ Runs the post.
             Called by run_worker_job() """
         params: dict = self.prep_params( entry )
         temp_process_id = random.randint( 1111, 9999 )
         log.debug( f'`{temp_process_id}` -- about to hit url' )
-        response = await asks.get( 'https://httpbin.org/delay/4' )
+        response = await asks.post( 'https://httpbin.org/delay/4' )
         log.debug( f'`{temp_process_id}` -- url response received, ```{response.content}```' )
         # response = await asks.get(url)
         return
 
     def prep_params( self, entry: dict ):
         """ Preps post params.
-            Called by grab_url() """
+            Called by post_update() """
         ( date_key, info ) = list( entry.items() )[0]  # date_key: str, info: dict
         log.debug( f'info, ```{info}```' )
         param_dct = {
@@ -319,13 +293,12 @@ class Updater:
             'non_hay_accessions': info['non-hay_accessions'],
             'non_hay_refiles': info['non-hay_refiles']
         }
-        param_dct_copy = param_dct.copy()
+        param_dct_copy = param_dct.copy()  # because you can't delete the dict keys as you're iterating through it
         for key in param_dct.keys():
             if param_dct[key] == 0:
                 del param_dct_copy[key]
         log.debug( f'param_dct_copy, ```{param_dct_copy}```' )
         return param_dct_copy
-
 
     ## end class Updater
 
