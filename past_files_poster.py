@@ -214,6 +214,34 @@ class Updater:
             for _ in range(n_workers):
                 self.nursery.start_soon( self.run_worker_job )
 
+    # async def run_worker_job( self ) -> None:
+    #     """ Manages worker job.
+    #         Called by manage_concurrent_updates() """
+    #     log.debug( 'function starting' )
+    #     temp_counter = 0
+    #     while self.continue_worker_flag is True:
+    #         temp_counter += 1
+    #         await self.get_mutex().acquire()
+    #         log.debug( 'mutex acquired to start job' )
+    #         self.nursery.start_soon( self.tick )
+    #         entry: dict = self.grab_next_entry()
+    #         if entry and temp_counter < 3:
+    #             log.info( 'no more entries -- cancel' )
+    #             self.continue_worker_flag = False
+    #             break
+    #         elif temp_counter >= 3:  # sanity-check
+    #             log.info( f'temp_counter, `{temp_counter}`, so will stop' )
+    #             self.continue_worker_flag = False
+    #             break
+    #         else:
+    #             # params: dict = self.prep_params( entry )
+    #             # response = await asks.post( entry, data=params )
+    #             # self.update_tracker( response )
+
+    #             await self.grab_url()
+    #             log.debug( 'url processed' )
+    #     return
+
     async def run_worker_job( self ) -> None:
         """ Manages worker job.
             Called by manage_concurrent_updates() """
@@ -226,16 +254,16 @@ class Updater:
             self.nursery.start_soon( self.tick )
             entry: dict = self.grab_next_entry()
             if entry is None:
-                log.info( 'no more entries -- send cancel' )
+                log.info( 'no more entries -- cancel' )
                 self.continue_worker_flag = False
-            elif temp_counter == 3:
+            elif temp_counter == 3:  # sanity-check
                 log.info( f'temp_counter, `{temp_counter}`, so will stop' )
                 self.continue_worker_flag = False
             else:
                 # params: dict = self.prep_params( entry )
                 # response = await asks.post( entry, data=params )
                 # self.update_tracker( response )
-                await self.grab_url()
+                await self.grab_url( entry )
                 log.debug( 'url processed' )
         return
 
@@ -251,31 +279,52 @@ class Updater:
         await trio.sleep( self.throttle )
         self.mutex.release()
 
-    def grab_next_entry( self ):
-        batch = None
+    def grab_next_entry( self ) -> dict:
+        """ Finds and returns next entry to process.
+            Called by run_worker_job() """
+        batch = {}
         for key in self.updated_count_tracker_dct.keys():
             entry = self.updated_count_tracker_dct[key]
             # twentyfour_hours_ago = datetime.datetime.now() + datetime.timedelta( hours=-24 )
             # if entry['last_grabbed'] is None or datetime.datetime.strptime( entry['last_grabbed'], '%Y-%m-%dT%H:%M:%S.%f' ) < twentyfour_hours_ago:  # the second 'or' condition converts the isoformat-date back into a date-object to be able to compare
             if entry['updated'] is None:
                 log.debug( 'found a next-batch' )
-                batch = entry.copy()
+                batch = { key: entry.copy() }
                 entry['updated'] = 'in_process'
                 break
         log.debug( f'returning batch, ```{batch}```' )
         log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
         return batch
 
-    async def grab_url( self,  ):
-        # dummy_delay = 2
-        # log.debug( f'about to sleep for, `{dummy_delay}` second(s)' )
-        # time.sleep( dummy_delay )
+    async def grab_url( self, entry: dict  ):
+        """ Runs the post.
+            Called by run_worker_job() """
+        params: dict = self.prep_params( entry )
         temp_process_id = random.randint( 1111, 9999 )
         log.debug( f'`{temp_process_id}` -- about to hit url' )
         response = await asks.get( 'https://httpbin.org/delay/4' )
         log.debug( f'`{temp_process_id}` -- url response received, ```{response.content}```' )
         # response = await asks.get(url)
         return
+
+    def prep_params( self, entry: dict ):
+        """ Preps post params.
+            Called by grab_url() """
+        ( date_key, info ) = list( entry.items() )[0]  # date_key: str, info: dict
+        log.debug( f'info, ```{info}```' )
+        param_dct = {
+            'date': date_key,
+            'hay_accessions': info['hay_accessions'],
+            'hay_refiles': info['hay_refiles'],
+            'non_hay_accessions': info['non-hay_accessions'],
+            'non_hay_refiles': info['non-hay_refiles']
+        }
+        param_dct_copy = param_dct.copy()
+        for key in param_dct.keys():
+            if param_dct[key] == 0:
+                del param_dct_copy[key]
+        log.debug( f'param_dct_copy, ```{param_dct_copy}```' )
+        return param_dct_copy
 
 
     ## end class Updater
