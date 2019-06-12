@@ -2,7 +2,7 @@
 
 import argparse, datetime, glob, json, logging, os, pprint, time
 from operator import itemgetter
-from typing import List
+from typing import Iterator, List
 
 
 logging.basicConfig(
@@ -173,7 +173,7 @@ class Updater:
             """
         with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
             count_tracker_dct = json.loads( f.read() )
-        for date_key in count_tracker_dct.keys()
+        for date_key in count_tracker_dct.keys():
             entry = count_tracker_dct[key]
             entry['updated'] = None
         self.updated_count_tracker_dct = count_tracker_dct
