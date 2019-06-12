@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse, datetime, glob, json, logging, os, pprint, time
+from functools import partial
 from operator import itemgetter
 from typing import Iterator, List
 
@@ -167,6 +168,7 @@ class Updater:
         self.nursery = None
         self.throttle: float = 1.0
         self.mutex = None
+        self.continue_worker_flag = True
 
     def update_db( self ) -> None:
         """ Calls concurrency-manager function.
@@ -182,7 +184,7 @@ class Updater:
         self.updated_count_tracker_dct = count_tracker_dct
         with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
             f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
-        trio.run( partial(self.manage_concurrent_updates, urls=iter(links), n_workers=3) )
+        trio.run( partial(self.manage_concurrent_updates, n_workers=3) )
         return
 
     def setup_final_tracker( self ) -> None:
@@ -202,7 +204,7 @@ class Updater:
             self.updated_count_tracker_dct = count_tracker_dct
         return
 
-    async def manage_concurrent_updates(self, urls: Iterator, n_workers: int ):
+    async def manage_concurrent_updates(self, n_workers: int ):
         """ Manages asynchronous processing of db updates.
             Called by update_db() """
         async with trio.open_nursery() as nursery:
@@ -214,13 +216,18 @@ class Updater:
         """ Manages worker job.
             Called by manage_concurrent_updates() """
         log.debug( 'function starting' )
-        await self.get_mutex().acquire()
-        log.debug( 'mutex acquired to start job' )
-        self.nursery.start_soon( self.tick )
-        entry: dict = self.grab_next_entry()
-        params: dict = self.prep_params( entry )
-        response = await asks.post( entry, data=params )
-        self.update_tracker( response )
+        if self.continue_worker_flag is True:
+            await self.get_mutex().acquire()
+            log.debug( 'mutex acquired to start job' )
+            self.nursery.start_soon( self.tick )
+            entry: dict = self.grab_next_entry()
+            if entry is None:
+                log.info( 'no more entries -- send cancel' )
+                self.continue_worker_flag = False
+                break
+            params: dict = self.prep_params( entry )
+            response = await asks.post( entry, data=params )
+            self.update_tracker( response )
         return
 
     def get_mutex( self ):
@@ -236,11 +243,12 @@ class Updater:
         self.mutex.release()
 
     def grab_next_entry( self ) -> dict:
+        batch: dict
         for key in self.count_tracker_dct.keys():
-            entry = self.count_tracker_dct[key]
+            entry = self.updated_count_tracker_dct[key]
             # twentyfour_hours_ago = datetime.datetime.now() + datetime.timedelta( hours=-24 )
             # if entry['last_grabbed'] is None or datetime.datetime.strptime( entry['last_grabbed'], '%Y-%m-%dT%H:%M:%S.%f' ) < twentyfour_hours_ago:  # the second 'or' condition converts the isoformat-date back into a date-object to be able to compare
-            if entry['last_grabbed'] is None:
+            if entry['updated'] is None:
                 batch = entry
                 break
 
