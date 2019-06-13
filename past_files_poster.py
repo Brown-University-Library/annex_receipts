@@ -179,14 +179,6 @@ class Updater:
             Credit: <https://stackoverflow.com/questions/51250706/combining-semaphore-and-time-limiting-in-python-trio-with-asks-http-request>
             """
         self.setup_final_tracker()
-        # with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
-        #     count_tracker_dct = json.loads( f.read() )
-        # for date_key in count_tracker_dct.keys():
-        #     entry = count_tracker_dct[date_key]
-        #     entry['updated'] = None
-        # self.updated_count_tracker_dct = count_tracker_dct
-        with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
-            f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
         trio.run( partial(self.manage_concurrent_updates, n_workers=3) )
         log.debug( f'total time taken, `{str( datetime.datetime.now() - self.start )}` seconds' )
         return
@@ -206,6 +198,8 @@ class Updater:
                 entry = count_tracker_dct[date_key]
                 entry['updated'] = None
             self.updated_count_tracker_dct = count_tracker_dct
+            with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
+                f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
         return
 
     async def manage_concurrent_updates(self, n_workers: int ):
