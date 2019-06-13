@@ -179,12 +179,12 @@ class Updater:
             Credit: <https://stackoverflow.com/questions/51250706/combining-semaphore-and-time-limiting-in-python-trio-with-asks-http-request>
             """
         self.setup_final_tracker()
-        with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
-            count_tracker_dct = json.loads( f.read() )
-        for date_key in count_tracker_dct.keys():
-            entry = count_tracker_dct[date_key]
-            entry['updated'] = None
-        self.updated_count_tracker_dct = count_tracker_dct
+        # with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
+        #     count_tracker_dct = json.loads( f.read() )
+        # for date_key in count_tracker_dct.keys():
+        #     entry = count_tracker_dct[date_key]
+        #     entry['updated'] = None
+        # self.updated_count_tracker_dct = count_tracker_dct
         with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
             f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
         trio.run( partial(self.manage_concurrent_updates, n_workers=3) )
@@ -259,6 +259,7 @@ class Updater:
             Called by run_worker_job() """
         key_entry: Optional[dict] = None
         for key, count_info in self.updated_count_tracker_dct.items():
+            log.debug( f'current key, `{key}`; current count_info, ```{count_info}```' )
             if count_info['updated'] is None:
                 log.debug( 'found next entry to process' )
                 key_entry = { key: count_info }
@@ -268,21 +269,6 @@ class Updater:
         log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
         return key_entry
 
-    # def grab_next_entry( self ) -> dict:
-    #     """ Finds and returns next entry to process.
-    #         Called by run_worker_job() """
-    #     key_entry = {}
-    #     for key in self.updated_count_tracker_dct.keys():
-    #         count_info: dict = self.updated_count_tracker_dct[key]
-    #         if count_info['updated'] is None:
-    #             log.debug( 'found a next key_entry' )
-    #             key_entry = { key: count_info.copy() }
-    #             count_info['updated'] = 'in_process'
-    #             break
-    #     log.debug( f'returning key_entry, ```{key_entry}```' )
-    #     log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
-    #     return key_entry
-
     async def post_update( self, entry: dict  ):
         """ Runs the post.
             Called by run_worker_job() """
@@ -290,12 +276,12 @@ class Updater:
         params['auth_key'] = self.API_AUTHKEY
         temp_process_id = random.randint( 1111, 9999 )
         log.debug( f'`{temp_process_id}` -- about to hit url' )
-        # response = await asks.post( 'https://httpbin.org/delay/4' )
         resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
-        log.debug( f'status_code, `{resp.status_code}`' )
+        log.debug( f'status_code, `{resp.status_code}`; type(status_code), `{type(resp.status_code)}`' )
         log.debug( f'content, ```{resp.content.decode("utf-8")}```')
         log.debug( f'`{temp_process_id}` -- url response received, ```{resp.content}```' )
-        entry['updated'] = True
+        date_key, other = list(entry.items())[0]
+        self.updated_count_tracker_dct[date_key]['updated'] = True
         return
 
     def prep_params( self, entry: dict ):
