@@ -228,9 +228,7 @@ class Updater:
                 log.info( f'temp_counter, `{temp_counter}`, so will stop' )
                 self.continue_worker_flag = False
             else:
-                # params: dict = self.prep_params( entry )
-                # response = await asks.post( entry, data=params )
-                # self.update_tracker( response )
+                # await asks.get( 'https://httpbin.org/delay/4' )
                 await self.post_update( entry )
                 log.debug( 'url processed' )
                 self.save_updated_tracker()
@@ -253,14 +251,14 @@ class Updater:
             Called by run_worker_job() """
         key_entry: Optional[dict] = None
         for key, count_info in self.updated_count_tracker_dct.items():
-            log.debug( f'current key, `{key}`; current count_info, ```{count_info}```' )
+            # log.debug( f'current key, `{key}`; current count_info, ```{count_info}```' )
             if count_info['updated'] is None:
                 log.debug( 'found next entry to process' )
                 key_entry = { key: count_info }
                 count_info['updated'] = 'in_process'
                 break
         log.debug( f'returning key_entry, ```{key_entry}```' )
-        log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
+        # log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
         return key_entry
 
     async def post_update( self, entry: dict  ):
@@ -270,12 +268,15 @@ class Updater:
         params['auth_key'] = self.API_AUTHKEY
         temp_process_id = random.randint( 1111, 9999 )
         log.debug( f'`{temp_process_id}` -- about to hit url' )
-        resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
-        log.debug( f'status_code, `{resp.status_code}`; type(status_code), `{type(resp.status_code)}`' )
-        log.debug( f'content, ```{resp.content.decode("utf-8")}```')
+        # resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
+        resp = await asks.get( 'https://httpbin.org/delay/4' )
         log.debug( f'`{temp_process_id}` -- url response received, ```{resp.content}```' )
         date_key, other = list(entry.items())[0]
-        self.updated_count_tracker_dct[date_key]['updated'] = True
+        if resp.status_code == 200:
+            self.updated_count_tracker_dct[date_key]['updated'] = str( datetime.datetime.now() )
+        else:
+            self.updated_count_tracker_dct[date_key]['updated'] = 'PROBLEM'
+            log.debug( f'status_code, `{resp.status_code}`; type(status_code), `{type(resp.status_code)}`; content, ```{resp.content}```' )
         return
 
     def prep_params( self, entry: dict ):
