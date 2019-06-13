@@ -3,7 +3,7 @@
 import argparse, datetime, glob, json, logging, os, pprint, random, time
 from functools import partial
 from operator import itemgetter
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 
 import asks, trio
 
@@ -226,7 +226,7 @@ class Updater:
             await self.get_mutex().acquire()
             log.debug( 'mutex acquired to start job' )
             self.nursery.start_soon( self.tick )
-            entry: dict = self.grab_next_entry()
+            entry: Optional[dict] = self.grab_next_entry()
             if entry is None:
                 log.info( 'no more entries -- cancel' )
                 self.continue_worker_flag = False
@@ -254,22 +254,34 @@ class Updater:
         await trio.sleep( self.throttle )
         self.mutex.release()
 
-    def grab_next_entry( self ) -> dict:
+    def grab_next_entry( self ) -> Optional[dict]:
         """ Finds and returns next entry to process.
             Called by run_worker_job() """
-        batch = {}
-        for key in self.updated_count_tracker_dct.keys():
-            entry = self.updated_count_tracker_dct[key]
-            # twentyfour_hours_ago = datetime.datetime.now() + datetime.timedelta( hours=-24 )
-            # if entry['last_grabbed'] is None or datetime.datetime.strptime( entry['last_grabbed'], '%Y-%m-%dT%H:%M:%S.%f' ) < twentyfour_hours_ago:  # the second 'or' condition converts the isoformat-date back into a date-object to be able to compare
-            if entry['updated'] is None:
-                log.debug( 'found a next-batch' )
-                batch = { key: entry.copy() }
-                entry['updated'] = 'in_process'
+        key_entry: Optional[dict] = None
+        for key, count_info in self.updated_count_tracker_dct.items():
+            if count_info['updated'] is None:
+                log.debug( 'found next entry to process' )
+                key_entry = { key: count_info }
+                count_info['updated'] = 'in_process'
                 break
-        log.debug( f'returning batch, ```{batch}```' )
+        log.debug( f'returning key_entry, ```{key_entry}```' )
         log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
-        return batch
+        return key_entry
+
+    # def grab_next_entry( self ) -> dict:
+    #     """ Finds and returns next entry to process.
+    #         Called by run_worker_job() """
+    #     key_entry = {}
+    #     for key in self.updated_count_tracker_dct.keys():
+    #         count_info: dict = self.updated_count_tracker_dct[key]
+    #         if count_info['updated'] is None:
+    #             log.debug( 'found a next key_entry' )
+    #             key_entry = { key: count_info.copy() }
+    #             count_info['updated'] = 'in_process'
+    #             break
+    #     log.debug( f'returning key_entry, ```{key_entry}```' )
+    #     log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
+    #     return key_entry
 
     async def post_update( self, entry: dict  ):
         """ Runs the post.
