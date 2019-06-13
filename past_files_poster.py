@@ -268,8 +268,8 @@ class Updater:
         params['auth_key'] = self.API_AUTHKEY
         temp_process_id = random.randint( 1111, 9999 )
         log.debug( f'`{temp_process_id}` -- about to hit url' )
-        # resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
-        resp = await asks.get( 'https://httpbin.org/delay/4' )
+        resp = await asks.post( self.API_UPDATER_URL, data=params, timeout=10 )
+        # resp = await asks.get( 'https://httpbin.org/delay/4' )
         log.debug( f'`{temp_process_id}` -- url response received, ```{resp.content}```' )
         date_key, other = list(entry.items())[0]
         if resp.status_code == 200:
@@ -305,6 +305,43 @@ class Updater:
     ## end class Updater
 
 
+# --------------------
+# caller
+# --------------------
+
+
+def parse_args():
+    """ Parses arguments when module called via __main__ """
+    parser = argparse.ArgumentParser( description='Required: function-name.' )
+    parser.add_argument( '--function', '-f', help='function name required', required=True )
+    args_dict = vars( parser.parse_args() )
+    return args_dict
+
+
+def call_function( function_name: str ) -> None:
+    """ Safely calls function named via input string to __main__
+        Credit: <https://stackoverflow.com/a/51456172> """
+    log.debug( f'function_name, ```{function_name}```' )
+    initializer = Initializer()
+    counter = Counter()
+    updater = Updater()
+    safe_dispatcher = {
+        'initialize_tracker': initializer.initialize_tracker,
+        'build_counts': counter.build_count_tracker,
+        'update_db': updater.update_db
+        }
+    try:
+        safe_dispatcher[function_name]()
+    except:
+        raise Exception( 'invalid function' )
+    return
+
+
+if __name__ == '__main__':
+    args: dict = parse_args()
+    log.debug( f'args, ```{args}```' )
+    submitted_function: str = args['function']
+    call_function( submitted_function )
 
 
 # --------------------
@@ -412,42 +449,3 @@ class Updater:
 #     return responses
 
 # responses = trio.run(fetch_urls, links, 5, 1.)
-
-
-# --------------------
-# caller
-# --------------------
-
-
-def parse_args():
-    """ Parses arguments when module called via __main__ """
-    parser = argparse.ArgumentParser( description='Required: function-name.' )
-    parser.add_argument( '--function', '-f', help='function name required', required=True )
-    args_dict = vars( parser.parse_args() )
-    return args_dict
-
-
-def call_function( function_name: str ) -> None:
-    """ Safely calls function named via input string to __main__
-        Credit: <https://stackoverflow.com/a/51456172> """
-    log.debug( f'function_name, ```{function_name}```' )
-    initializer = Initializer()
-    counter = Counter()
-    updater = Updater()
-    safe_dispatcher = {
-        'initialize_tracker': initializer.initialize_tracker,
-        'build_counts': counter.build_count_tracker,
-        'update_db': updater.update_db
-        }
-    try:
-        safe_dispatcher[function_name]()
-    except:
-        raise Exception( 'invalid function' )
-    return
-
-
-if __name__ == '__main__':
-    args: dict = parse_args()
-    log.debug( f'args, ```{args}```' )
-    submitted_function: str = args['function']
-    call_function( submitted_function )
