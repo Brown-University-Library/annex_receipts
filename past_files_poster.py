@@ -172,6 +172,7 @@ class Updater:
         self.mutex = None
         self.continue_worker_flag = True
         self.start = datetime.datetime.now()
+        self.sanity_check_limit: int = 3
 
     def update_db( self ) -> None:
         """ Calls concurrency-manager function.
@@ -224,7 +225,7 @@ class Updater:
             if entry is None:
                 log.info( 'no more entries -- cancel' )
                 self.continue_worker_flag = False
-            elif temp_counter == 3:  # sanity-check
+            elif temp_counter >= self.sanity_check_limit:
                 log.info( f'temp_counter, `{temp_counter}`, so will stop' )
                 self.continue_worker_flag = False
             else:
