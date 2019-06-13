@@ -193,14 +193,23 @@ class Updater:
                 log.debug( 'existing updated_count_tracker found and loaded' )
         except Exception as e:
             log.debug( f'updated_count_tracker _not_ found, exception was ```{e}```, so creating it' )
-            with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
-                count_tracker_dct = json.loads( f.read() )
-            for date_key in count_tracker_dct.keys():
-                entry = count_tracker_dct[date_key]
-                entry['updated'] = None
-            self.updated_count_tracker_dct = count_tracker_dct
-            with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
-                f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
+            self.create_final_tracker()
+        return
+
+    def create_final_tracker( self ) -> None:
+        """ Writes final-tracker-file.
+            Called by setup_final_tracker() """
+        with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
+            count_tracker_dct = json.loads( f.read() )
+        for date_key, count_info in count_tracker_dct.items():
+            count_info['updated'] = None
+            actual_count_info_keys = list( count_info.keys() )
+            for required_key in ['hay_accessions', 'hay_refiles', 'non-hay_accessions', 'non-hay_refiles']:
+                if required_key not in actual_count_info_keys:
+                    count_info[required_key] = 0
+        self.updated_count_tracker_dct = count_tracker_dct
+        with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
+            f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
         return
 
     async def manage_concurrent_updates(self, n_workers: int ):
