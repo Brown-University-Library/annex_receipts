@@ -70,6 +70,29 @@ class Counter:
         self.date_dct = {}
         self.start = datetime.datetime.now()
 
+    # def build_count_tracker( self ) -> None:
+    #     """
+    #     Flow...
+    #     load file
+    #     create new count_tracker file
+    #     create a list of date-dicts by going through all entries
+    #     for each entry
+    #         determin the proper date
+    #         determine the _kind_ of count
+    #         determine the count
+    #         update the count-tracker file
+    #     """
+    #     file_entries: List[dict] = self.load_file_list()
+    #     self.initialize_count_tracker()
+    #     self.make_date_dict( file_entries )
+    #     for entry in file_entries:
+    #         entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
+    #         count_type: str = self.parse_type( entry['path'] )
+    #         count: int = self.parse_count( entry['path'] )
+    #         self.date_dct[str(entry_date)][count_type] = count
+    #     self.update_count_tracker()
+    #     return
+
     def build_count_tracker( self ) -> None:
         """
         Flow...
@@ -89,7 +112,8 @@ class Counter:
             entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
             count_type: str = self.parse_type( entry['path'] )
             count: int = self.parse_count( entry['path'] )
-            self.date_dct[str(entry_date)][count_type] = count
+            self.update_date_dct( entry_date, count_type, count )  # handles multiple files in a given day
+            # self.date_dct[str(entry_date)][count_type] = count
         self.update_count_tracker()
         return
 
@@ -145,6 +169,14 @@ class Counter:
             data = f.readlines()
         count = len( data )
         return count
+
+    def update_date_dct( self, entry_date, count_type, count ) -> None:
+        if count_type in self.date_dct[str(entry_date)].keys():
+            log.info( f'existing count of `{count}` already found for date, ```{entry_date}```; count_type, `{count_type}`' )
+            self.date_dct[str(entry_date)][count_type] += count
+        else:
+            self.date_dct[str(entry_date)][count_type] = count
+        return
 
     def update_count_tracker( self ) -> None:
         """ Writes file.
