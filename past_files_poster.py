@@ -70,29 +70,6 @@ class Counter:
         self.date_dct = {}
         self.start = datetime.datetime.now()
 
-    # def build_count_tracker( self ) -> None:
-    #     """
-    #     Flow...
-    #     load file
-    #     create new count_tracker file
-    #     create a list of date-dicts by going through all entries
-    #     for each entry
-    #         determin the proper date
-    #         determine the _kind_ of count
-    #         determine the count
-    #         update the count-tracker file
-    #     """
-    #     file_entries: List[dict] = self.load_file_list()
-    #     self.initialize_count_tracker()
-    #     self.make_date_dict( file_entries )
-    #     for entry in file_entries:
-    #         entry_date: datetime.date = datetime.datetime.strptime( entry['timestamp'], '%Y-%m-%d %H:%M:%S' ).date()
-    #         count_type: str = self.parse_type( entry['path'] )
-    #         count: int = self.parse_count( entry['path'] )
-    #         self.date_dct[str(entry_date)][count_type] = count
-    #     self.update_count_tracker()
-    #     return
-
     def build_count_tracker( self ) -> None:
         """
         Flow...
@@ -191,7 +168,25 @@ class Counter:
 
 
 class Updater:
-    """ Updates db. """
+    """ Updates db -- uses _replacer_ url to replace any existing data with new data. """
+
+    def __init__( self ):
+        self.COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_B_PATH']
+        self.UPDATED_COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_C_PATH']
+        self.API_UPDATER_URL = os.environ['ANXEOD__ANNEX_COUNTS_API_UPDATER_URL']
+        self.API_AUTHKEY = os.environ['ANXEOD__ANNEX_COUNTS_API_AUTHKEY']
+        self.updated_count_tracker_dct = {}
+        self.nursery = None
+        self.throttle: float = 1.0
+        self.continue_worker_flag = True
+        self.start = datetime.datetime.now()
+        self.sanity_check_limit: int = 3
+
+    ## end class Updater
+
+
+class OLDUpdater:
+    """ Old code for updating db. """
 
     def __init__( self ):
         self.COUNT_TRACKER_PATH = os.environ['ANXEOD__TRACKER_B_PATH']
@@ -344,7 +339,7 @@ class Updater:
         log.debug( 'updated tracker saved' )
         return
 
-    ## end class Updater
+    ## end class OLDUpdater
 
 
 # --------------------
