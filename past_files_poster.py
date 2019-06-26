@@ -182,7 +182,45 @@ class Updater:
         self.start = datetime.datetime.now()
         self.sanity_check_limit: int = 3
 
-    ## end class Updater
+    def update_db( self ) -> None:
+        """ Calls concurrency-manager function.
+            Called by main()
+            Credit: <https://stackoverflow.com/questions/51250706/combining-semaphore-and-time-limiting-in-python-trio-with-asks-http-request>
+            """
+        self.setup_final_tracker()
+        trio.run( process_file )
+        log.debug( f'total time taken, `{str( datetime.datetime.now() - self.start )}` seconds' )
+        return
+
+    def setup_final_tracker( self ) -> None:
+        """ Initializes final tracker if it doesn't exist.
+            Called by update_db() """
+        try:
+            with open( self.UPDATED_COUNT_TRACKER_PATH, 'r' ) as f:
+                self.updated_count_tracker_dct = json.loads( f.read() )
+                log.debug( 'existing updated_count_tracker found and loaded' )
+        except Exception as e:
+            log.debug( f'updated_count_tracker _not_ found, exception was ```{e}```, so creating it' )
+            self.create_final_tracker()
+        return
+
+    def create_final_tracker( self ) -> None:
+        """ Writes final-tracker-file.
+            Called by setup_final_tracker() """
+        with open( self.COUNT_TRACKER_PATH, 'r' ) as f:
+            count_tracker_dct = json.loads( f.read() )
+        for date_key, count_info in count_tracker_dct.items():
+            count_info['updated'] = None
+            actual_count_info_keys = list( count_info.keys() )
+            for required_key in ['hay_accessions', 'hay_refiles', 'non-hay_accessions', 'non-hay_refiles']:
+                if required_key not in actual_count_info_keys:
+                    count_info[required_key] = 0
+        self.updated_count_tracker_dct = count_tracker_dct
+        with open( self.UPDATED_COUNT_TRACKER_PATH, 'w' ) as f:
+            f.write( json.dumps(self.updated_count_tracker_dct, sort_keys=True, indent=2) )
+        return
+
+    ## end class Replacer
 
 
 class OLDUpdater:
@@ -361,11 +399,11 @@ def call_function( function_name: str ) -> None:
     log.debug( f'function_name, ```{function_name}```' )
     initializer = Initializer()
     counter = Counter()
-    updater = Updater()
+    replacer = Replacer()
     safe_dispatcher = {
         'initialize_tracker': initializer.initialize_tracker,
         'build_counts': counter.build_count_tracker,
-        'update_db': updater.update_db
+        'update_db': replacer.update_db
         }
     try:
         safe_dispatcher[function_name]()
