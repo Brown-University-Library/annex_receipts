@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import argparse, datetime, glob, json, logging, os, plog.debug, random, time
+import argparse, datetime, glob, json, logging, os, random, time
 from functools import partial
 from operator import itemgetter
 from typing import Iterator, List, Optional
@@ -180,7 +180,7 @@ class Replacer:
         # self.throttle: float = 1.0
         # self.continue_worker_flag = True
         self.start = datetime.datetime.now()
-        self.sanity_check_limit: int = 10
+        self.sanity_check_limit: int = 5
 
     def update_db( self ) -> None:
         """ Calls concurrency-manager function.
@@ -205,11 +205,12 @@ class Replacer:
         async def read_entries():
             async with reader_channel_input:
                 for idx, key_entry in enumerate( self.updated_count_tracker_dct.keys() ):
-                    log.debug( f'reading key `{key_entry}`' )
+                    log.debug( f'reading key `{key_entry}` at idx, `{idx}`' )
                     await reader_channel_input.send(key_entry)
                     # await trio.sleep(1)
-                    if idx > self.sanity_check_limit:
+                    if idx+1 >= self.sanity_check_limit:
                         log.debug( f'sanity_check_limit, `{self.sanity_check_limit}` reached; will stop reading new entries' )
+                        break
 
         ## worker function triggered when output appears in the reader-channel
         ## - performs work, then sends result of work to the saver-channel
@@ -218,7 +219,7 @@ class Replacer:
             async for key_entry in reader_channel_output:
                 # log.debug( f'reader_channel_output currently, `{reader_channel_output}`' )  # not useful, just the addresses of the same channel and buffer; don't know if contents can be viewed on-the-fly
                 log.debug( f'posting key `{key_entry}` from worker `{n}` at time `{time.monotonic()}`' )
-                r = await asks.post(f"https://httpbin.org/delay/{5 * random()}")
+                r = await asks.post(f"https://httpbin.org/delay/{5 * random.random()}")
                 log.debug( f'r.url, ```{r.url}```' )
                 await saver_channel_input.send( f'sending output from response... key, `{key_entry}`; response-code, `{r.status_code}`; worker, `{n}`; time, `{time.monotonic()}`' )
 
