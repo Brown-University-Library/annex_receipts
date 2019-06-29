@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import argparse, datetime, glob, json, logging, os, pprint, random, time
+import argparse, datetime, glob, json, logging, os, plog.debug, random, time
 from functools import partial
 from operator import itemgetter
 from typing import Iterator, List, Optional
@@ -119,7 +119,7 @@ class Counter:
             date_obj: datetime.date = datetime.datetime.strptime( timestamp, '%Y-%m-%d %H:%M:%S' ).date()
             date_str: str = str( date_obj )
             self.date_dct[date_str] = {}
-        log.debug( f'self.date_dct, ```{pprint.pformat(self.date_dct)[0:100]}```' )
+        log.debug( f'self.date_dct, ```{plog.debug.pformat(self.date_dct)[0:100]}```' )
         log.debug( f'num-dates, `{len(self.date_dct.keys())}`' )
         return
 
@@ -177,10 +177,10 @@ class Replacer:
         self.API_AUTHKEY = os.environ['ANXEOD__ANNEX_COUNTS_API_AUTHKEY']
         self.updated_count_tracker_dct = {}
         self.nursery = None
-        self.throttle: float = 1.0
-        self.continue_worker_flag = True
+        # self.throttle: float = 1.0
+        # self.continue_worker_flag = True
         self.start = datetime.datetime.now()
-        self.sanity_check_limit: int = 3
+        self.sanity_check_limit: int = 10
 
     def update_db( self ) -> None:
         """ Calls concurrency-manager function.
@@ -204,37 +204,39 @@ class Replacer:
         ## reader function that puts data into the reader-channel
         async def read_entries():
             async with reader_channel_input:
-                for key_entry in range(5):
-                    print( f'reading key `{key_entry}`' )
+                for idx, key_entry in enumerate( self.updated_count_tracker_dct.keys() ):
+                    log.debug( f'reading key `{key_entry}`' )
                     await reader_channel_input.send(key_entry)
                     # await trio.sleep(1)
+                    if idx > self.sanity_check_limit:
+                        log.debug( f'sanity_check_limit, `{self.sanity_check_limit}` reached; will stop reading new entries' )
 
         ## worker function triggered when output appears in the reader-channel
         ## - performs work, then sends result of work to the saver-channel
         async def work(n):
-            print( f'reader_channel_output, `{reader_channel_output}`; worker, `{n}`' )
+            log.debug( f'reader_channel_output, `{reader_channel_output}`; worker, `{n}`' )
             async for key_entry in reader_channel_output:
-                # print( f'reader_channel_output currently, `{reader_channel_output}`' )  # not useful, just the addresses of the same channel and buffer; don't know if contents can be viewed on-the-fly
-                print( f'posting key `{key_entry}` from worker `{n}` at time `{time.monotonic()}`' )
+                # log.debug( f'reader_channel_output currently, `{reader_channel_output}`' )  # not useful, just the addresses of the same channel and buffer; don't know if contents can be viewed on-the-fly
+                log.debug( f'posting key `{key_entry}` from worker `{n}` at time `{time.monotonic()}`' )
                 r = await asks.post(f"https://httpbin.org/delay/{5 * random()}")
-                print( f'r.url, ```{r.url}```' )
+                log.debug( f'r.url, ```{r.url}```' )
                 await saver_channel_input.send( f'sending output from response... key, `{key_entry}`; response-code, `{r.status_code}`; worker, `{n}`; time, `{time.monotonic()}`' )
 
         ##  saver function triggered whenever data appears on the saver channel
         async def save_entries():
             async for entry in saver_channel_output:
-                # print( "saving", entry )
-                print( f'saving entry `{entry}`' )
+                # log.debug( "saving", entry )
+                log.debug( f'saving entry `{entry}`' )
 
         ## main process_file_asynchronously() code
         async with trio.open_nursery() as nursery:
             nursery.start_soon(read_entries)
             nursery.start_soon(save_entries)
             async with saver_channel_input:
-                print( f'saver_channel_input, `{saver_channel_input}`' )
+                log.debug( f'saver_channel_input, `{saver_channel_input}`' )
                 async with trio.open_nursery() as workers:
                     for n in range(3):
-                        print( f'worker `{n}` instantiated' )
+                        log.debug( f'worker `{n}` instantiated' )
                         workers.start_soon(work, n)
 
         ## end async def process_file_asynchronously()
@@ -381,7 +383,7 @@ class OLDUpdater:
                 count_info['updated'] = 'in_process'
                 break
         log.debug( f'returning key_entry, ```{key_entry}```' )
-        # log.debug( f'self.updated_count_tracker_dct, ```{pprint.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
+        # log.debug( f'self.updated_count_tracker_dct, ```{plog.debug.pformat(self.updated_count_tracker_dct)[0:1000]}```' )
         return key_entry
 
     async def post_update( self, entry: dict  ):
@@ -479,7 +481,7 @@ if __name__ == '__main__':
 # # works...
 # # --------------------
 
-# import pprint
+# import plog.debug
 # from functools import partial
 # from typing import List, Iterator
 
@@ -506,7 +508,7 @@ if __name__ == '__main__':
 #     async def worker():
 #         for url in urls:
 #             await mutex.acquire()
-#             print( f'[{round(trio.current_time(), 2)}] Start loading link: {url}' )
+#             log.debug( f'[{round(trio.current_time(), 2)}] Start loading link: {url}' )
 #             nursery.start_soon(tick)
 #             response = await asks.get(url)
 #             responses.append(response)
@@ -519,7 +521,7 @@ if __name__ == '__main__':
 # # trio.run( fetch_urls, urls=iter(links), responses=responses, n_workers=5, throttle=1 )  # doesn't work
 # trio.run( partial(fetch_urls, urls=iter(links), responses=responses, n_workers=5, throttle=1) )  # works
 
-# print( f'responses, ```{pprint.pformat(responses)}```' )
+# log.debug( f'responses, ```{plog.debug.pformat(responses)}```' )
 
 
 # --------------------
@@ -554,9 +556,9 @@ if __name__ == '__main__':
 #             for url in url_iterator:
 #                 await token_receiver.receive()
 
-#                 print(f'[{round(trio.current_time(), 2)}] Start loading link: {url}')
+#                 log.debug(f'[{round(trio.current_time(), 2)}] Start loading link: {url}')
 #                 response = await asks.get(url)
-#                 # print(f'[{round(trio.current_time(), 2)}] Loaded link: {url}')
+#                 # log.debug(f'[{round(trio.current_time(), 2)}] Loaded link: {url}')
 #                 responses.append(response)
 
 #     responses = []
