@@ -167,7 +167,7 @@ class Counter:
     ## end class Counter
 
 
-class Updater:
+class Replacer:
     """ Updates db -- uses _replacer_ url to replace any existing data with new data. """
 
     def __init__( self ):
@@ -188,9 +188,57 @@ class Updater:
             Credit: <https://stackoverflow.com/questions/51250706/combining-semaphore-and-time-limiting-in-python-trio-with-asks-http-request>
             """
         self.setup_final_tracker()
-        trio.run( process_file )
+        trio.run( self.process_file_asynchronously )
         log.debug( f'total time taken, `{str( datetime.datetime.now() - self.start )}` seconds' )
         return
+
+
+    async def process_file_asynchronously( self ) -> None:
+        """ Manages processing stages.
+            Called by update_db() """
+
+        ## set up channels
+        reader_channel_input, reader_channel_output = trio.open_memory_channel(0)
+        saver_channel_input, saver_channel_output = trio.open_memory_channel(0)
+
+        ## reader function that puts data into the reader-channel
+        async def read_entries():
+            async with reader_channel_input:
+                for key_entry in range(5):
+                    print( f'reading key `{key_entry}`' )
+                    await reader_channel_input.send(key_entry)
+                    # await trio.sleep(1)
+
+        ## worker function triggered when output appears in the reader-channel
+        ## - performs work, then sends result of work to the saver-channel
+        async def work(n):
+            print( f'reader_channel_output, `{reader_channel_output}`; worker, `{n}`' )
+            async for key_entry in reader_channel_output:
+                # print( f'reader_channel_output currently, `{reader_channel_output}`' )  # not useful, just the addresses of the same channel and buffer; don't know if contents can be viewed on-the-fly
+                print( f'posting key `{key_entry}` from worker `{n}` at time `{time.monotonic()}`' )
+                r = await asks.post(f"https://httpbin.org/delay/{5 * random()}")
+                print( f'r.url, ```{r.url}```' )
+                await saver_channel_input.send( f'sending output from response... key, `{key_entry}`; response-code, `{r.status_code}`; worker, `{n}`; time, `{time.monotonic()}`' )
+
+        ##  saver function triggered whenever data appears on the saver channel
+        async def save_entries():
+            async for entry in saver_channel_output:
+                # print( "saving", entry )
+                print( f'saving entry `{entry}`' )
+
+        ## main process_file_asynchronously() code
+        async with trio.open_nursery() as nursery:
+            nursery.start_soon(read_entries)
+            nursery.start_soon(save_entries)
+            async with saver_channel_input:
+                print( f'saver_channel_input, `{saver_channel_input}`' )
+                async with trio.open_nursery() as workers:
+                    for n in range(3):
+                        print( f'worker `{n}` instantiated' )
+                        workers.start_soon(work, n)
+
+        ## end async def process_file_asynchronously()
+
 
     def setup_final_tracker( self ) -> None:
         """ Initializes final tracker if it doesn't exist.
